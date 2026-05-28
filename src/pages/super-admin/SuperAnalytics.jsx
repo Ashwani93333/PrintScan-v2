@@ -21,12 +21,16 @@ import {
   Upload, 
   SlidersHorizontal,
   TrendingUp,
-  Layers
+  Layers,
+  Users
 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 
 const SuperAnalytics = () => {
-  const { getAnalytics } = useDb();
+  const { getAnalytics, shops } = useDb();
+
+  // Sum total QR visitors across all shops
+  const totalQrVisitors = shops.reduce((sum, s) => sum + (s.qrVisits || 0), 0);
 
   // Date filters states
   const [from, setFrom] = useState('2026-05-01');
@@ -148,6 +152,13 @@ const SuperAnalytics = () => {
               <span className="text-[9px] text-muted font-bold uppercase tracking-wider block">Files Spooled</span>
               <span className="text-xl font-bold text-white block">{stats.totalFilesUploaded}</span>
               <span className="text-[8px] text-muted flex items-center gap-0.5"><Upload className="w-2.5 h-2.5" /> documents</span>
+            </div>
+
+            {/* Total QR Visitors */}
+            <div className="bg-surface-ink border border-accent/20 p-4 rounded-xl space-y-1">
+              <span className="text-[9px] text-accent font-bold uppercase tracking-wider block">QR Visitors</span>
+              <span className="text-xl font-bold text-accent block">{totalQrVisitors}</span>
+              <span className="text-[8px] text-muted flex items-center gap-0.5"><Users className="w-2.5 h-2.5 text-accent" /> total scans</span>
             </div>
 
           </div>

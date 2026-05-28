@@ -437,7 +437,7 @@ const AdminProfile = () => {
                 <div className="bg-surface-dark border border-border rounded-2xl p-4 flex flex-col items-center justify-center aspect-square relative group">
                   {shopUrl ? (
                     <img 
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent("http://10.49.179.150:5173/shops/campus-quick-print")}`}
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(shopUrl)}`}
                       alt="Shop QR Code"
                       className="w-44 h-44 rounded-lg bg-white p-2 border border-border shadow-inner"
                     />

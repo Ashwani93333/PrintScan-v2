@@ -297,6 +297,12 @@ const TrackJobPage = () => {
                     <span className="text-muted">Files Transmitted:</span>
                     <span className="text-white font-bold">{job.files?.length} Files</span>
                   </div>
+
+                  {/* Total Pages */}
+                  <div className="flex justify-between py-1.5 border-b border-border/20">
+                    <span className="text-muted">Total Pages:</span>
+                    <span className="text-white font-bold">{job.totalPages !== null && job.totalPages !== undefined ? `${job.totalPages} Pages` : '—'}</span>
+                  </div>
                   
                   {/* File Names listing */}
                   <div className="py-1">

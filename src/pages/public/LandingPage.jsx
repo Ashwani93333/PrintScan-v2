@@ -66,7 +66,7 @@ const LandingPage = () => {
               <form onSubmit={handleTrackSubmit} className="relative flex-1 max-w-sm flex items-center">
                 <input
                   type="text"
-                  placeholder="Enter Job Token (e.g. E9A4F8)..."
+                  placeholder="Enter Job Token (e.g. 1)..."
                   value={tokenInput}
                   onChange={(e) => setTokenInput(e.target.value)}
                   className="w-full pr-12 text-sm bg-surface-ink border border-border focus:border-accent rounded-xl"
@@ -323,11 +323,11 @@ const LandingPage = () => {
                   <h4 className="text-xs font-mono text-accent uppercase tracking-widest font-bold">Realtime Job Queue</h4>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs py-1.5 border-b border-border/40">
-                      <span className="font-mono text-white font-semibold">Job #E9A4F8</span>
+                      <span className="font-mono text-white font-semibold">Job #1</span>
                       <span className="text-[10px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded-full font-bold">PENDING</span>
                     </div>
                     <div className="flex items-center justify-between text-xs py-1.5 border-b border-border/40">
-                      <span className="font-mono text-white font-semibold">Job #B3K9X2</span>
+                      <span className="font-mono text-white font-semibold">Job #2</span>
                       <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full font-bold">PROCESSING</span>
                     </div>
                   </div>

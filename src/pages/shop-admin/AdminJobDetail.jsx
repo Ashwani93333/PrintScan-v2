@@ -102,6 +102,161 @@ const AdminJobDetail = () => {
     setToastMessage(`Downloading "${fileName}" to local spool directory...`);
   };
 
+  const handlePrintFile = (fileName, fileObj) => {
+    setToastType('success');
+    setToastMessage(`Streaming "${fileName}" directly to your configured printer...`);
+    
+    // Open a print window for the file
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Direct Print - \${fileName}</title>
+          <style>
+            body {
+              font-family: 'Sora', 'Arial', sans-serif;
+              padding: 40px;
+              color: #1A2035;
+              background-color: #ffffff;
+              text-align: center;
+            }
+            .ticket {
+              border: 3px dashed #1A2035;
+              padding: 30px;
+              max-width: 480px;
+              margin: 0 auto;
+              border-radius: 16px;
+            }
+            .brand {
+              font-size: 24px;
+              font-weight: 800;
+              color: #1A2035;
+              margin-bottom: 10px;
+            }
+            .brand span {
+              color: #E8A838;
+            }
+            .divider {
+              border-top: 2px solid #E8A838;
+              margin: 20px 0;
+            }
+            h2 {
+              font-size: 18px;
+              margin: 10px 0;
+            }
+            .meta-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+              font-size: 13px;
+              text-align: left;
+            }
+            .meta-table th, .meta-table td {
+              padding: 8px 4px;
+            }
+            .meta-table th {
+              color: #8A8FA3;
+              font-weight: 600;
+            }
+            .meta-table td {
+              color: #1A2035;
+              font-weight: 700;
+              text-align: right;
+            }
+            .footer-notes {
+              font-size: 11px;
+              color: #8A8FA3;
+              margin-top: 30px;
+              line-height: 1.4;
+            }
+            .no-print-btn {
+              margin-bottom: 20px;
+              padding: 10px 20px;
+              background-color: #E8A838;
+              color: #1A2035;
+              border: none;
+              border-radius: 8px;
+              font-weight: bold;
+              cursor: pointer;
+            }
+            @media print {
+              .no-print-btn {
+                display: none;
+              }
+              body {
+                padding: 0;
+              }
+              .ticket {
+                border: none;
+                padding: 0;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <button class="no-print-btn" onclick="window.print()">Print This Spool Ticket</button>
+          
+          <div class="ticket">
+            <div class="brand">Print<span>Ease</span></div>
+            <div class="divider"></div>
+            <h2>SPOOL DOCUMENT RECEIVED</h2>
+            
+            <table class="meta-table">
+              <tr>
+                <th>File Name</th>
+                <td>\${fileName}</td>
+              </tr>
+              <tr>
+                <th>Job Token</th>
+                <td>#\${job.accessToken}</td>
+              </tr>
+              <tr>
+                <th>Customer</th>
+                <td>\${job.customerName}</td>
+              </tr>
+              <tr>
+                <th>Pages to Print</th>
+                <td>\${fileObj.pageCount || 1} Pages</td>
+              </tr>
+              <tr>
+                <th>Mode</th>
+                <td>\${fileObj.colorPrint ? 'Full Color' : 'B&W (Grayscale)'}</td>
+              </tr>
+              <tr>
+                <th>Copies</th>
+                <td>\${fileObj.copies || 1} Copies</td>
+              </tr>
+              <tr>
+                <th>Duplexing</th>
+                <td>\${fileObj.doubleSided ? 'Double-Sided' : 'Single-Sided'}</td>
+              </tr>
+              <tr>
+                <th>Mime Type</th>
+                <td>\${fileObj.mimeType || 'application/octet-stream'}</td>
+              </tr>
+            </table>
+
+            <div class="divider"></div>
+            
+            <div class="footer-notes">
+              <strong>Spooler Engine v2.0.4</strong><br/>
+              Ensure target tray has matching paper size.
+            </div>
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   const triggerJobCancellation = () => {
     setConfirmOpen(true);
   };
@@ -244,29 +399,51 @@ const AdminJobDetail = () => {
                 </h3>
 
                 <div className="space-y-2.5">
-                  {job.files?.map(file => (
-                    <div key={file.id} className="flex items-center justify-between p-3.5 bg-surface-dark/60 border border-border/80 rounded-xl hover:border-accent/20 transition-all">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <FileText className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                        <div className="min-w-0 text-left">
-                          <span className="text-xs font-semibold text-white truncate block max-w-[200px] sm:max-w-[400px]">
-                            {file.originalName}
-                          </span>
-                          <span className="text-[10px] text-muted block">
-                            Size: {(file.sizeBytes / (1024 * 1024)).toFixed(2)} MB • Format: {file.mimeType}
-                          </span>
+                  {job.files?.map(file => {
+                    const pricePerPg = file.colorPrint 
+                      ? (shop?.requirements.pricePerPageColor || 10.00) 
+                      : (shop?.requirements.pricePerPageBW || 2.00);
+                    const filePageCount = file.pageCount || 1;
+                    const fileCopies = file.copies || 1;
+                    const fileCost = filePageCount * pricePerPg * fileCopies;
+
+                    return (
+                      <div key={file.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-surface-dark/60 border border-border/80 rounded-xl hover:border-accent/20 transition-all gap-3">
+                        <div className="flex items-start gap-3 min-w-0">
+                          <FileText className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                          <div className="min-w-0 text-left">
+                            <span className="text-xs font-semibold text-white truncate block max-w-[200px] sm:max-w-[400px]">
+                              {file.originalName}
+                            </span>
+                            <span className="text-[10px] text-muted block mt-0.5">
+                              Size: {(file.sizeBytes / (1024 * 1024)).toFixed(2)} MB • {filePageCount} {filePageCount === 1 ? 'page' : 'pages'}
+                            </span>
+                            <span className="inline-block mt-1 text-[9px] font-semibold bg-[#E6F4EA] text-[#137333] px-2 py-0.5 rounded">
+                              {file.colorPrint ? 'Color' : 'B&W'} • {fileCopies} {fileCopies === 1 ? 'copy' : 'copies'} • {file.doubleSided ? 'Double-Sided' : 'Single-Sided'} • ₹{fileCost.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 self-start sm:self-center">
+                          <button
+                            onClick={() => handleDownloadFile(file.originalName)}
+                            className="px-3 py-1.5 bg-surface-ink hover:bg-surface-dark border border-border rounded-lg text-xs font-semibold text-white flex items-center gap-1.5 hover:text-accent hover:border-accent/40 transition-all duration-150"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            Download
+                          </button>
+                          
+                          <button
+                            onClick={() => handlePrintFile(file.originalName, file)}
+                            className="px-3 py-1.5 bg-accent hover:bg-accent-hover text-background rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all duration-150"
+                          >
+                            <Printer className="w-3.5 h-3.5" />
+                            Print
+                          </button>
                         </div>
                       </div>
-
-                      <button
-                        onClick={() => handleDownloadFile(file.originalName)}
-                        className="px-3 py-1.5 bg-surface-ink hover:bg-surface-dark border border-border rounded-lg text-xs font-semibold text-white flex items-center gap-1.5 hover:text-accent hover:border-accent/40 transition-all duration-150"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        Download
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -281,6 +458,22 @@ const AdminJobDetail = () => {
                   <Settings className="w-4.5 h-4.5 text-accent" />
                   Job Operations
                 </h3>
+
+                {/* Exact Price & Total Pages Summary Box */}
+                <div className="p-3.5 bg-surface-dark/80 border border-border rounded-2xl space-y-2 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted font-medium">Total Print Pages:</span>
+                    <span className="text-white font-bold font-mono bg-surface-ink px-2 py-0.5 rounded border border-border">
+                      {job.totalPages || 0} Pages
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted font-medium">Exact Price:</span>
+                    <span className="text-[#00A884] font-extrabold font-mono text-sm">
+                      ₹{(job.estimatedCost || 0).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
 
                 <form onSubmit={handleUpdateStatusSubmit} className="space-y-4">
                   {/* Select status */}

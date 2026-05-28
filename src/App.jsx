@@ -5,7 +5,6 @@ import { useAuth } from './context/AuthContext';
 // Import Pages
 import LandingPage from './pages/public/LandingPage';
 import FindShopPage from './pages/public/FindShopPage';
-import ShopDetailPage from './pages/public/ShopDetailPage';
 import UploadPage from './pages/public/UploadPage';
 import TrackJobPage from './pages/public/TrackJobPage';
 import RegisterShopPage from './pages/public/RegisterShopPage';
@@ -60,7 +59,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/shops" element={<FindShopPage />} />
-        <Route path="/shops/:slug" element={<ShopDetailPage />} />
+        <Route path="/shops/:slug" element={<UploadPage />} />
         <Route path="/shops/:slug/upload" element={<UploadPage />} />
         <Route path="/track/:token" element={<TrackJobPage />} />
         <Route path="/register" element={<RegisterShopPage />} />

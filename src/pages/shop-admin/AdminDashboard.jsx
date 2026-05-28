@@ -14,7 +14,11 @@ import {
   Eye, 
   TrendingUp,
   FileCheck2,
-  QrCode
+  QrCode,
+  Layers,
+  Users,
+  Calendar,
+  Activity
 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 import StatusBadge from '../../components/StatusBadge';
@@ -34,6 +38,49 @@ const AdminDashboard = () => {
   const pendingJobs = shopJobs.filter(j => j.status === 'PENDING').length;
   const completedJobs = shopJobs.filter(j => j.status === 'COMPLETED').length;
   const cancelledJobs = shopJobs.filter(j => j.status === 'CANCELLED').length;
+  
+  // Analytics calculations
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfWeek = new Date(startOfToday.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  // Filter jobs by date helper
+  const filterJobsByDate = (jobList, startDate) => {
+    return jobList.filter(j => new Date(j.createdAt) >= startDate);
+  };
+
+  // Completed jobs only for revenue and pages printed
+  const completedShopJobs = shopJobs.filter(j => j.status === 'COMPLETED');
+  
+  const completedToday = filterJobsByDate(completedShopJobs, startOfToday);
+  const completedThisWeek = filterJobsByDate(completedShopJobs, startOfWeek);
+  const completedThisMonth = filterJobsByDate(completedShopJobs, startOfMonth);
+
+  // Revenue calculations (completed jobs)
+  const revenueToday = completedToday.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
+  const revenueThisWeek = completedThisWeek.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
+  const revenueThisMonth = completedThisMonth.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
+  const revenueTotal = completedShopJobs.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
+
+  // Total pages printed (completed jobs)
+  const pagesToday = completedToday.reduce((sum, j) => sum + (j.totalPages || 0), 0);
+  const pagesThisMonth = completedThisMonth.reduce((sum, j) => sum + (j.totalPages || 0), 0);
+  const pagesTotal = completedShopJobs.reduce((sum, j) => sum + (j.totalPages || 0), 0);
+
+  // QR visits
+  const qrVisits = shop?.qrVisits || 0;
+
+  // Jobs & Files created today
+  const jobsToday = filterJobsByDate(shopJobs, startOfToday);
+  const filesToday = jobsToday.reduce((sum, j) => sum + (j.files?.length || 0), 0);
+
+  const jobsTodayByStatus = {
+    PENDING: jobsToday.filter(j => j.status === 'PENDING').length,
+    PROCESSING: jobsToday.filter(j => j.status === 'PROCESSING').length,
+    COMPLETED: jobsToday.filter(j => j.status === 'COMPLETED').length,
+    CANCELLED: jobsToday.filter(j => j.status === 'CANCELLED').length
+  };
   
   // Sort and limit recent jobs (last 5)
   const recentJobs = [...shopJobs]
@@ -114,6 +161,119 @@ const AdminDashboard = () => {
 
           </div>
 
+          {/* Shop Analytics & Insights Section */}
+          <div className="bg-surface-ink border border-border rounded-3xl p-6 shadow-xl space-y-6 animate-fade-up">
+            <div className="flex items-center justify-between border-b border-border/40 pb-3">
+              <div className="space-y-1">
+                <h2 className="text-sm font-serif font-extrabold text-white flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-accent animate-pulse-subtle" />
+                  Shop Analytics & Revenue Insights
+                </h2>
+                <p className="text-xs text-muted">Real-time metrics to scale your counter and cloud printing revenue.</p>
+              </div>
+              <span className="text-[10px] bg-accent/10 border border-accent/20 px-2.5 py-1 rounded-full text-accent font-mono font-bold uppercase">
+                Active Cycle
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Card 1: Revenue Increment */}
+              <div className="bg-surface-dark border border-border rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted font-bold tracking-widest uppercase">Revenue Stream</span>
+                  <span className="p-2 bg-success/10 text-success border border-success/20 rounded-xl">
+                    <span className="text-xs font-extrabold">₹</span>
+                  </span>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
+                    <span className="text-xs text-muted">Today</span>
+                    <span className="font-mono text-sm text-white font-extrabold">₹{revenueToday.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
+                    <span className="text-xs text-muted">This Week</span>
+                    <span className="font-mono text-sm text-white font-extrabold">₹{revenueThisWeek.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
+                    <span className="text-xs text-muted">This Month</span>
+                    <span className="font-mono text-sm text-accent font-extrabold">₹{revenueThisMonth.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-end pt-0.5">
+                    <span className="text-xs text-muted font-bold">Total Earned</span>
+                    <span className="font-mono text-base text-success font-black">₹{revenueTotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: Print Operations */}
+              <div className="bg-surface-dark border border-border rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted font-bold tracking-widest uppercase">Print Volume</span>
+                  <span className="p-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl">
+                    <Layers className="w-4 h-4" />
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
+                    <span className="text-xs text-muted">Pages Today</span>
+                    <span className="font-mono text-sm text-white font-bold">{pagesToday} pgs</span>
+                  </div>
+                  <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
+                    <span className="text-xs text-muted">Pages This Month</span>
+                    <span className="font-mono text-sm text-white font-bold">{pagesThisMonth} pgs</span>
+                  </div>
+                  <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
+                    <span className="text-xs text-muted font-bold">Total Printed</span>
+                    <span className="font-mono text-sm text-blue-400 font-extrabold">{pagesTotal} pgs</span>
+                  </div>
+                  <div className="flex justify-between items-end pt-0.5">
+                    <span className="text-xs text-muted font-bold">QR Visits (Traffic)</span>
+                    <span className="font-mono text-base text-accent font-black">{qrVisits} visits</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3: Today's Dispatch Activity */}
+              <div className="bg-surface-dark border border-border rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted font-bold tracking-widest uppercase">Today's Traffic</span>
+                  <span className="p-2 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-xl">
+                    <Activity className="w-4 h-4" />
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center border-b border-border/20 pb-1.5">
+                    <span className="text-xs text-muted">Files Received</span>
+                    <span className="font-mono text-sm text-white font-bold">{filesToday} files</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 pt-1 text-[10px]">
+                    <div className="p-2 bg-surface-ink/60 border border-border/30 rounded-lg text-left">
+                      <span className="text-muted block uppercase tracking-wide text-[8px]">Pending</span>
+                      <span className="font-mono text-xs text-accent font-bold">{jobsTodayByStatus.PENDING}</span>
+                    </div>
+                    <div className="p-2 bg-surface-ink/60 border border-border/30 rounded-lg text-left">
+                      <span className="text-muted block uppercase tracking-wide text-[8px]">Processing</span>
+                      <span className="font-mono text-xs text-blue-400 font-bold">{jobsTodayByStatus.PROCESSING}</span>
+                    </div>
+                    <div className="p-2 bg-surface-ink/60 border border-border/30 rounded-lg text-left">
+                      <span className="text-muted block uppercase tracking-wide text-[8px]">Completed</span>
+                      <span className="font-mono text-xs text-success font-bold">{jobsTodayByStatus.COMPLETED}</span>
+                    </div>
+                    <div className="p-2 bg-surface-ink/60 border border-border/30 rounded-lg text-left">
+                      <span className="text-muted block uppercase tracking-wide text-[8px]">Cancelled</span>
+                      <span className="font-mono text-xs text-danger font-bold">{jobsTodayByStatus.CANCELLED}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
           {/* Table & Quick Actions grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
@@ -137,7 +297,7 @@ const AdminDashboard = () => {
                 <div className="py-12 text-center text-xs text-muted space-y-2">
                   <p>No print jobs registered yet.</p>
                   <button 
-                    onClick={() => navigate(`/shops/${shop?.slug || 'campus-quick-print'}/upload`)}
+                    onClick={() => navigate(`/shops/${shop?.slug || 'campus-quick-print'}`)}
                     className="text-accent underline font-semibold"
                   >
                     Simulate customer file upload
@@ -151,7 +311,8 @@ const AdminDashboard = () => {
                         <th className="py-3 px-3">Token</th>
                         <th className="py-3 px-3">Customer</th>
                         <th className="py-3 px-3">Status</th>
-                        <th className="py-3 px-3">Files</th>
+                        <th className="py-3 px-3">Pages</th>
+                        <th className="py-3 px-3">Price</th>
                         <th className="py-3 px-3">Submitted At</th>
                         <th className="py-3 px-3 text-right">Actions</th>
                       </tr>
@@ -164,7 +325,14 @@ const AdminDashboard = () => {
                           <td className="py-3 px-3">
                             <StatusBadge status={job.status} />
                           </td>
-                          <td className="py-3 px-3 text-muted">{job.files?.length} files</td>
+                          <td className="py-3 px-3 text-muted">
+                            {job.totalPages !== null && job.totalPages !== undefined ? `${job.totalPages} pgs` : '—'}
+                          </td>
+                          <td className="py-3 px-3 font-mono text-white font-semibold">
+                            {job.estimatedCost !== null && job.estimatedCost !== undefined 
+                              ? `₹${job.estimatedCost.toFixed(2)}` 
+                              : '—'}
+                          </td>
                           <td className="py-3 px-3 text-muted">{new Date(job.createdAt).toLocaleTimeString()}</td>
                           <td className="py-3 px-3 text-right">
                             <button

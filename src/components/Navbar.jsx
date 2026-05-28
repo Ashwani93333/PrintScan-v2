@@ -20,7 +20,7 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Find a Shop', path: '/shops' },
-    { name: 'Track My Print', path: '/track/E9A4F8' }, // Mocking tracking link placeholder
+    { name: 'Track My Print', path: '/track/1' }, // Mocking tracking link placeholder
   ];
 
   return (

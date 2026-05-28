@@ -7,7 +7,9 @@ import {
   ChevronRight, 
   Inbox, 
   Eye, 
-  Building 
+  Building,
+  TrendingUp,
+  Layers
 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 import StatusBadge from '../../components/StatusBadge';
@@ -65,6 +67,13 @@ const SuperJobsList = () => {
   };
 
   const statuses = ['ALL', 'PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED'];
+
+  // Live summary metrics derived from all filteredJobs (not just paginated)
+  const filteredTotalJobs = filteredJobs.length;
+  const filteredTotalRevenue = filteredJobs.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
+  const filteredTotalPages = filteredJobs.reduce((sum, j) => sum + (j.totalPages || 0), 0);
+  const filteredCompletedJobs = filteredJobs.filter(j => j.status === 'COMPLETED').length;
+  const selectedShopName = shopFilter === 'ALL' ? 'All Shops' : (shops.find(s => s.id === shopFilter)?.name || 'Unknown');
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
@@ -168,6 +177,61 @@ const SuperJobsList = () => {
                     className="text-xs bg-background border border-border rounded-xl"
                   />
                 </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Live Summary Bar — updates reactively on shop/filter change */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 animate-fade-up">
+            
+            {/* Summary: Total Jobs */}
+            <div className="bg-surface-ink border border-border rounded-2xl p-4 flex items-center justify-between gap-3 shadow-md hover:border-accent/30 transition-all">
+              <div className="space-y-0.5">
+                <span className="text-[9px] text-muted font-bold uppercase tracking-widest block">Jobs Matched</span>
+                <span className="text-2xl font-black text-white font-mono block">{filteredTotalJobs}</span>
+                <span className="text-[9px] text-muted block">{selectedShopName}</span>
+              </div>
+              <div className="p-2.5 bg-surface-dark border border-border rounded-xl text-blue-400">
+                <Layers className="w-5 h-5" />
+              </div>
+            </div>
+
+            {/* Summary: Total Revenue */}
+            <div className="bg-surface-ink border border-border rounded-2xl p-4 flex items-center justify-between gap-3 shadow-md hover:border-success/30 transition-all">
+              <div className="space-y-0.5">
+                <span className="text-[9px] text-muted font-bold uppercase tracking-widest block">Total Revenue</span>
+                <span className="text-2xl font-black text-success font-mono block">₹{filteredTotalRevenue.toFixed(0)}</span>
+                <span className="text-[9px] text-muted block">est. from all jobs</span>
+              </div>
+              <div className="p-2.5 bg-surface-dark border border-success/20 rounded-xl text-success">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+            </div>
+
+            {/* Summary: Completed Jobs */}
+            <div className="bg-surface-ink border border-border rounded-2xl p-4 flex items-center justify-between gap-3 shadow-md hover:border-accent/30 transition-all">
+              <div className="space-y-0.5">
+                <span className="text-[9px] text-muted font-bold uppercase tracking-widest block">Completed</span>
+                <span className="text-2xl font-black text-accent font-mono block">{filteredCompletedJobs}</span>
+                <span className="text-[9px] text-muted block">of {filteredTotalJobs} jobs</span>
+              </div>
+              <div className="p-2.5 bg-surface-dark border border-accent/20 rounded-xl">
+                <span className="text-accent text-xs font-black">
+                  {filteredTotalJobs > 0 ? Math.round((filteredCompletedJobs / filteredTotalJobs) * 100) : 0}%
+                </span>
+              </div>
+            </div>
+
+            {/* Summary: Total Pages */}
+            <div className="bg-surface-ink border border-border rounded-2xl p-4 flex items-center justify-between gap-3 shadow-md hover:border-blue-400/30 transition-all">
+              <div className="space-y-0.5">
+                <span className="text-[9px] text-muted font-bold uppercase tracking-widest block">Total Pages</span>
+                <span className="text-2xl font-black text-blue-400 font-mono block">{filteredTotalPages}</span>
+                <span className="text-[9px] text-muted block">pages spooled</span>
+              </div>
+              <div className="p-2.5 bg-surface-dark border border-blue-500/20 rounded-xl text-blue-400">
+                <Building className="w-5 h-5" />
               </div>
             </div>
 

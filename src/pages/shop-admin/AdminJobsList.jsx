@@ -199,7 +199,7 @@ const AdminJobsList = () => {
                       <th className="py-4 px-4">Customer Name</th>
                       <th className="py-4 px-4">Phone</th>
                       <th className="py-4 px-4">Status</th>
-                      <th className="py-4 px-4">Files</th>
+                      <th className="py-4 px-4">Pages (Files)</th>
                       <th className="py-4 px-4">Est. Cost</th>
                       <th className="py-4 px-4">Created At</th>
                       <th className="py-4 px-4 text-right">Actions</th>
@@ -214,7 +214,9 @@ const AdminJobsList = () => {
                         <td className="py-3.5 px-4">
                           <StatusBadge status={job.status} />
                         </td>
-                        <td className="py-3.5 px-4 text-muted font-medium">{job.files?.length} files</td>
+                        <td className="py-3.5 px-4 text-muted font-medium">
+                          {job.totalPages !== null && job.totalPages !== undefined ? `${job.totalPages} pgs` : '—'} ({job.files?.length || 0} files)
+                        </td>
                         <td className="py-3.5 px-4 font-mono text-white font-semibold">
                           {job.estimatedCost !== null && job.estimatedCost !== undefined 
                             ? `₹${job.estimatedCost.toFixed(2)}` 

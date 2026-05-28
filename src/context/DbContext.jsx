@@ -2,6 +2,17 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const DbContext = createContext();
 
+// Safe UUID/unique ID generator for non-secure HTTP contexts
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 // Initial mock shops
 const INITIAL_SHOPS = [
   {
@@ -17,6 +28,7 @@ const INITIAL_SHOPS = [
     "adminEmail": "contact@campusquickprint.com",
     "adminName": "Ashish Sharma",
     "createdAt": "2026-05-15T09:00:00",
+    "qrVisits": 142,
     "requirements": {
       "acceptedFormats": ["PDF", "JPG", "PNG", "DOCX"],
       "maxFileSizeMb": 25,
@@ -38,6 +50,7 @@ const INITIAL_SHOPS = [
     "adminEmail": "owner@printease.com", // Main demo owner
     "adminName": "Rajiv Khanna",
     "createdAt": "2026-05-16T10:30:00",
+    "qrVisits": 89,
     "requirements": {
       "acceptedFormats": ["PDF", "JPG", "PNG"],
       "maxFileSizeMb": 50,
@@ -52,7 +65,7 @@ const INITIAL_SHOPS = [
 const INITIAL_JOBS = [
   {
     "id": "e4c76b92-ca9d-40c2-bd74-1234a9efb923",
-    "accessToken": "E9A4F8",
+    "accessToken": "1",
     "customerName": "Amit Kumar",
     "customerPhone": "+919988776655",
     "customerEmail": "amit.kumar@example.com",
@@ -84,7 +97,7 @@ const INITIAL_JOBS = [
   },
   {
     "id": "f9c11a03-bb4d-42e1-ac73-998bde4f7812",
-    "accessToken": "B3K9X2",
+    "accessToken": "2",
     "customerName": "Priya Singh",
     "customerPhone": "+919871234567",
     "customerEmail": "priya.singh@example.com",
@@ -116,7 +129,7 @@ const INITIAL_JOBS = [
   },
   {
     "id": "g7b22b14-cc5e-53f2-bd84-aa7cef5g8923",
-    "accessToken": "T7M3P5",
+    "accessToken": "3",
     "customerName": "Rohan Mehta",
     "customerPhone": "+919909876543",
     "customerEmail": "rohan.mehta@example.com",
@@ -148,15 +161,62 @@ const INITIAL_JOBS = [
   }
 ];
 
+// Bump this version whenever the data shape changes to force a localStorage reset
+const DB_VERSION = 3;
+
 export const DbProvider = ({ children }) => {
   const [shops, setShops] = useState(() => {
+    const savedVersion = localStorage.getItem('printease_db_version');
+    
+    // If version mismatch, clear stale data and start fresh
+    if (savedVersion !== String(DB_VERSION)) {
+      localStorage.removeItem('printease_shops');
+      localStorage.removeItem('printease_jobs');
+      localStorage.setItem('printease_db_version', String(DB_VERSION));
+      return INITIAL_SHOPS;
+    }
+
     const local = localStorage.getItem('printease_shops');
-    return local ? JSON.parse(local) : INITIAL_SHOPS;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Always merge in INITIAL_SHOPS so demo shops are never lost
+          const merged = [...parsed];
+          INITIAL_SHOPS.forEach(initialShop => {
+            if (!merged.some(s => s.id === initialShop.id)) {
+              merged.push(initialShop);
+            }
+          });
+          return merged;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return INITIAL_SHOPS;
   });
 
   const [jobs, setJobs] = useState(() => {
     const local = localStorage.getItem('printease_jobs');
-    return local ? JSON.parse(local) : INITIAL_JOBS;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Always merge in INITIAL_JOBS so demo jobs are never lost
+          const merged = [...parsed];
+          INITIAL_JOBS.forEach(initialJob => {
+            if (!merged.some(j => j.id === initialJob.id)) {
+              merged.push(initialJob);
+            }
+          });
+          return merged;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return INITIAL_JOBS;
   });
 
   useEffect(() => {
@@ -167,28 +227,32 @@ export const DbProvider = ({ children }) => {
     localStorage.setItem('printease_jobs', JSON.stringify(jobs));
   }, [jobs]);
 
-  // Helper: Generate uppercase unique token for job tracking
+  // Helper: Generate daily sequential numeric token (resets to 1 each day)
   const generateToken = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Avoid ambiguous chars
-    let token = '';
-    for (let i = 0; i < 6; i++) {
-      token += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    // Ensure uniqueness
-    if (jobs.some(j => j.accessToken === token)) {
-      return generateToken();
-    }
-    return token;
+    const todayStr = new Date().toISOString().substring(0, 10); // "YYYY-MM-DD"
+    const todaysJobs = jobs.filter(j => j.createdAt?.substring(0, 10) === todayStr);
+    const nextNumber = todaysJobs.length + 1;
+    return String(nextNumber);
   };
 
   // Customer: Upload print job
-  const submitPrintJob = (shopSlug, customerInfo, printOptions, uploadedFiles) => {
+  const submitPrintJob = (shopSlug, customerInfo, printOptions, filesList) => {
     const shop = shops.find(s => s.slug === shopSlug);
     if (!shop) return { success: false, error: 'Shop not found' };
 
     const token = generateToken();
+    
+    // Compute total pages and cost from individual files
+    const totalJobPages = filesList.reduce((sum, f) => sum + (f.pageCount * f.copies), 0);
+    const estimatedJobCost = filesList.reduce((sum, f) => {
+      const price = f.colorPrint 
+        ? shop.requirements.pricePerPageColor 
+        : shop.requirements.pricePerPageBW;
+      return sum + (f.pageCount * price * f.copies);
+    }, 0);
+
     const newJob = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       accessToken: token,
       customerName: customerInfo.fullName,
       customerPhone: customerInfo.phone,
@@ -197,22 +261,25 @@ export const DbProvider = ({ children }) => {
       shopId: shop.id,
       shopName: shop.name,
       printOptions: {
-        colorPrint: printOptions.colorPrint,
-        copies: parseInt(printOptions.copies) || 1,
-        paperSize: printOptions.paperSize,
-        doubleSided: printOptions.doubleSided,
+        colorPrint: filesList[0]?.colorPrint || false,
+        copies: filesList[0]?.copies || 1,
+        paperSize: printOptions.paperSize || 'A4',
+        doubleSided: filesList[0]?.doubleSided || false,
         specialInstructions: printOptions.specialInstructions || ''
       },
       adminNotes: null,
-      totalPages: null,
-      estimatedCost: null,
-      files: uploadedFiles.map(file => ({
-        id: crypto.randomUUID(),
-        originalName: file.name,
-        sizeBytes: file.size,
-        mimeType: file.type || 'application/octet-stream',
-        pageCount: null,
-        fileType: file.type?.startsWith('image/') ? 'IMAGE' : 'DOCUMENT'
+      totalPages: totalJobPages,
+      estimatedCost: estimatedJobCost,
+      files: filesList.map(f => ({
+        id: generateId(),
+        originalName: f.name,
+        sizeBytes: f.size,
+        mimeType: f.type || 'application/octet-stream',
+        pageCount: f.pageCount,
+        fileType: f.type?.startsWith('image/') ? 'IMAGE' : 'DOCUMENT',
+        colorPrint: f.colorPrint,
+        copies: f.copies,
+        doubleSided: f.doubleSided
       })),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -225,7 +292,7 @@ export const DbProvider = ({ children }) => {
   // Shop Owner: Register shop
   const registerShop = (shopData) => {
     const newShop = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       name: shopData.name,
       address: shopData.address,
       phone: shopData.phone,
@@ -330,7 +397,7 @@ export const DbProvider = ({ children }) => {
 
   const createShop = (shopData) => {
     const newShop = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       name: shopData.name,
       address: shopData.address,
       phone: shopData.phone,
@@ -364,6 +431,15 @@ export const DbProvider = ({ children }) => {
     // Also delete jobs for this shop
     setJobs(prev => prev.filter(j => j.shopId !== shopId));
     return { success: true };
+  };
+
+  const incrementQrVisits = (shopId) => {
+    setShops(prev => prev.map(s => {
+      if (s.id === shopId) {
+        return { ...s, qrVisits: (s.qrVisits || 0) + 1 };
+      }
+      return s;
+    }));
   };
 
   // Get dynamic platform analytics
@@ -439,6 +515,7 @@ export const DbProvider = ({ children }) => {
       toggleShopActive,
       createShop,
       deleteShop,
+      incrementQrVisits,
       getAnalytics
     }}>
       {children}
