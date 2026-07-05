@@ -16,26 +16,38 @@ const LoginPage = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [isPending, setIsPending] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+
+    // Client-side validation
+    if (!email.trim()) {
+      setErrorMsg('Please enter your email address.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+    if (!password) {
+      setErrorMsg('Please enter your password.');
+      return;
+    }
+
     setIsPending(true);
 
-    // Dynamic login execution simulation
-    setTimeout(() => {
-      const response = login(email, password);
-      setIsPending(false);
+    const response = await login(email, password);
+    setIsPending(false);
 
-      if (response.success) {
-        if (response.role === 'SUPER_ADMIN') {
-          navigate('/superadmin/dashboard');
-        } else if (response.role === 'ADMIN') {
-          navigate('/admin/dashboard');
-        }
-      } else {
-        setErrorMsg(response.error || 'Invalid credentials.');
+    if (response.success) {
+      if (response.role === 'SUPER_ADMIN') {
+        navigate('/superadmin/dashboard');
+      } else if (response.role === 'ADMIN') {
+        navigate('/admin/dashboard');
       }
-    }, 800);
+    } else {
+      setErrorMsg(response.error || 'Invalid credentials. Please check your email and password.');
+    }
   };
 
   return (

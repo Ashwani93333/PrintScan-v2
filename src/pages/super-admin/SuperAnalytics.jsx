@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useDb } from '../../context/DbContext';
+import React, { useState, useEffect } from 'react';
+import { api } from '../../services/api';
 import { 
   BarChart, 
   Bar, 
@@ -27,10 +27,16 @@ import {
 import Sidebar from '../../components/Sidebar';
 
 const SuperAnalytics = () => {
-  const { getAnalytics, shops } = useDb();
-
-  // Sum total QR visitors across all shops
-  const totalQrVisitors = shops.reduce((sum, s) => sum + (s.qrVisits || 0), 0);
+  const [shops, setShops] = useState([]);
+  const [stats, setStats] = useState({
+    totalShops: 0,
+    activeShops: 0,
+    totalJobs: 0,
+    completedJobs: 0,
+    cancelledJobs: 0,
+    jobsByDate: [],
+    shopCompletionRates: []
+  });
 
   // Date filters states
   const [from, setFrom] = useState('2026-05-01');
@@ -38,14 +44,33 @@ const SuperAnalytics = () => {
   const [activeFrom, setActiveFrom] = useState('2026-05-01');
   const [activeTo, setActiveTo] = useState('2026-05-31');
 
+  const fetchData = async () => {
+    try {
+      const [shopsData, analyticsData] = await Promise.all([
+        api.getSuperShops(0, 100),
+        api.getPlatformAnalytics(activeFrom, activeTo).catch(() => null)
+      ]);
+      setShops(shopsData.content || shopsData || []);
+      if (analyticsData) {
+        setStats(prev => ({ ...prev, ...analyticsData }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [activeFrom, activeTo]);
+
+  // Sum total QR visitors across all shops
+  const totalQrVisitors = shops.reduce((sum, s) => sum + (s.qrVisits || 0), 0);
+
   const handleApplyFilters = (e) => {
     e.preventDefault();
     setActiveFrom(from);
     setActiveTo(to);
   };
-
-  // Dynamically compute platform analytics based on current date bounds
-  const stats = getAnalytics(activeFrom, activeTo);
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
@@ -102,8 +127,8 @@ const SuperAnalytics = () => {
             </form>
           </div>
 
-          {/* KPI Cards Row (7 stats) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 animate-fade-up">
+          {/* KPI Cards Row */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 animate-fade-up">
             
             {/* Total Shops */}
             <div className="bg-surface-ink border border-border p-4 rounded-xl space-y-1">
@@ -122,7 +147,7 @@ const SuperAnalytics = () => {
             {/* Total Jobs */}
             <div className="bg-surface-ink border border-border p-4 rounded-xl space-y-1">
               <span className="text-[9px] text-muted font-bold uppercase tracking-wider block">Total Jobs</span>
-              <span className="text-xl font-bold text-white block">{stats.totalJobsInPeriod}</span>
+              <span className="text-xl font-bold text-white block">{stats.totalJobs}</span>
               <span className="text-[8px] text-muted flex items-center gap-0.5"><FileText className="w-2.5 h-2.5" /> in period</span>
             </div>
 
@@ -140,19 +165,7 @@ const SuperAnalytics = () => {
               <span className="text-[8px] text-muted flex items-center gap-0.5"><XCircle className="w-2.5 h-2.5 text-danger" /> aborted</span>
             </div>
 
-            {/* Pending Jobs */}
-            <div className="bg-surface-ink border border-border p-4 rounded-xl space-y-1">
-              <span className="text-[9px] text-muted font-bold uppercase tracking-wider block text-accent font-serif">Pending</span>
-              <span className="text-xl font-bold text-accent block">{stats.pendingJobs}</span>
-              <span className="text-[8px] text-muted flex items-center gap-0.5"><Clock className="w-2.5 h-2.5 text-accent animate-pulse" /> review queue</span>
-            </div>
 
-            {/* Total Files */}
-            <div className="bg-surface-ink border border-border p-4 rounded-xl space-y-1">
-              <span className="text-[9px] text-muted font-bold uppercase tracking-wider block">Files Spooled</span>
-              <span className="text-xl font-bold text-white block">{stats.totalFilesUploaded}</span>
-              <span className="text-[8px] text-muted flex items-center gap-0.5"><Upload className="w-2.5 h-2.5" /> documents</span>
-            </div>
 
             {/* Total QR Visitors */}
             <div className="bg-surface-ink border border-accent/20 p-4 rounded-xl space-y-1">
@@ -173,7 +186,7 @@ const SuperAnalytics = () => {
                 Continuous Daily Print Job Volume
               </h3>
 
-              {stats.jobsByDay.length === 0 ? (
+              {stats.jobsByDate.length === 0 ? (
                 <div className="h-64 flex justify-center items-center text-xs text-muted">
                   No print jobs registered within selected period bounds.
                 </div>
@@ -181,7 +194,7 @@ const SuperAnalytics = () => {
                 <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
-                      data={stats.jobsByDay}
+                      data={stats.jobsByDate}
                       margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                     >
                       <defs>
@@ -236,17 +249,17 @@ const SuperAnalytics = () => {
                 Top Performing Shops
               </h3>
 
-              {stats.topShops.length === 0 ? (
+              {stats.shopCompletionRates.length === 0 ? (
                 <div className="py-12 text-center text-xs text-muted">
                   No active rankings in selected period.
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {stats.topShops.map((item, idx) => (
+                  {stats.shopCompletionRates.map((item, idx) => (
                     <div key={idx} className="space-y-1.5">
                       <div className="flex justify-between items-center text-xs font-semibold">
                         <span className="text-white truncate max-w-[150px]">{item.shopName}</span>
-                        <span className="text-muted font-mono">{item.jobCount} jobs</span>
+                        {item.jobCount !== undefined && <span className="text-muted font-mono">{item.jobCount} jobs</span>}
                       </div>
                       
                       {/* Cost dynamic completion progress bar */}
@@ -254,12 +267,12 @@ const SuperAnalytics = () => {
                         <div className="w-full bg-surface-dark h-1.5 rounded-full overflow-hidden">
                           <div 
                             className="bg-accent h-full rounded-full transition-all duration-300"
-                            style={{ width: `${item.completionRate * 100}%` }}
+                            style={{ width: `${item.completionRate}%` }}
                           ></div>
                         </div>
                         <div className="flex justify-between text-[9px] text-muted">
                           <span>Completion Rate:</span>
-                          <span className="font-bold text-accent">{(item.completionRate * 100).toFixed(0)}%</span>
+                          <span className="font-bold text-accent">{item.completionRate?.toFixed(1) || 0}%</span>
                         </div>
                       </div>
                     </div>

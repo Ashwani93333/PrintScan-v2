@@ -1,13 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, CheckCircle, AlertTriangle, Info, AlertOctagon } from 'lucide-react';
 
 const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
+  // Use a ref to the latest onClose so the effect doesn't need it in deps array
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      onClose();
+      onCloseRef.current();
     }, duration);
     return () => clearTimeout(timer);
-  }, [onClose, duration]);
+  }, [duration]); // Only depends on duration, not the function reference
 
   const icons = {
     success: <CheckCircle className="w-5 h-5 text-success" />,

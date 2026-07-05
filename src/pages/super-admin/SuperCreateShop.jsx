@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useDb } from '../../context/DbContext';
+import { api } from '../../services/api';
 import { 
   Plus, 
   ArrowLeft, 
@@ -16,7 +16,6 @@ import Sidebar from '../../components/Sidebar';
 import Toast from '../../components/Toast';
 
 const SuperCreateShop = () => {
-  const { createShop } = useDb();
   const navigate = useNavigate();
 
   // Form states
@@ -31,17 +30,7 @@ const SuperCreateShop = () => {
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
 
-  // Requirements info
-  const [priceBW, setPriceBW] = useState(2.0);
-  const [priceColor, setPriceColor] = useState(10.0);
-  const [maxSize, setMaxSize] = useState(25);
-  const [maxFiles, setMaxFiles] = useState(5);
-  const [formats, setFormats] = useState({
-    PDF: true,
-    JPG: true,
-    PNG: true,
-    DOCX: true
-  });
+
 
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
@@ -56,27 +45,32 @@ const SuperCreateShop = () => {
     setSlug(generated);
   }, [shopName]);
 
-  const handleFormatsChange = (key) => {
-    setFormats(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const selectedFormats = Object.keys(formats).filter(k => formats[k]);
-    if (selectedFormats.length === 0) {
+    // Client-side validation
+    if (!shopName.trim() || !slug.trim() || !address.trim() || !phone.trim() || !email.trim()) {
       setToastType('error');
-      setToastMessage('Please select at least one accepted file format.');
+      setToastMessage('Please fill in all required fields.');
+      return;
+    }
+    if (!adminName.trim() || !adminEmail.trim()) {
+      setToastType('error');
+      setToastMessage('Please provide admin name and email.');
+      return;
+    }
+    if (!/^[a-z0-9-]+$/.test(slug)) {
+      setToastType('error');
+      setToastMessage('Slug can only contain lowercase letters, numbers, and hyphens.');
       return;
     }
 
     setIsPending(true);
 
-    setTimeout(() => {
-      const response = createShop({
+    try {
+      await api.createShopDirect({
         name: shopName,
         address,
         phone,
@@ -85,26 +79,19 @@ const SuperCreateShop = () => {
         description,
         adminName,
         adminEmail,
-        pricePerPageBW: parseFloat(priceBW),
-        pricePerPageColor: parseFloat(priceColor),
-        maxFileSizeMb: parseInt(maxSize),
-        maxFilesPerJob: parseInt(maxFiles),
-        acceptedFormats: selectedFormats
+        password: "Password123!" // Default password; admin should change after first login
       });
-
+      setToastType('success');
+      setToastMessage(`Shop "${shopName}" created and activated!`);
+      setTimeout(() => {
+        navigate('/superadmin/shops');
+      }, 1200);
+    } catch (err) {
+      setToastType('error');
+      setToastMessage(err.message || 'Failed to manually create shop.');
+    } finally {
       setIsPending(false);
-
-      if (response.success) {
-        setToastType('success');
-        setToastMessage(`Shop "${shopName}" created and activated!`);
-        setTimeout(() => {
-          navigate('/superadmin/shops');
-        }, 1200);
-      } else {
-        setToastType('error');
-        setToastMessage(response.error || 'Failed to manually create shop.');
-      }
-    }, 800);
+    }
   };
 
   return (
@@ -270,92 +257,7 @@ const SuperCreateShop = () => {
               </div>
             </div>
 
-            {/* Section 3: Requirements & Rates */}
-            <div className="bg-surface-ink border border-border rounded-3xl p-6 md:p-8 space-y-5 shadow-md">
-              <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-3 flex items-center gap-2">
-                <Sliders className="w-4.5 h-4.5 text-accent" />
-                3. Pricing Parameters
-              </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <label className="text-xs text-muted font-semibold">B&W Print Rate (per page) *</label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted">₹</span>
-                    <input
-                      type="number"
-                      step="0.05"
-                      value={priceBW}
-                      onChange={(e) => setPriceBW(parseFloat(e.target.value) || 0)}
-                      className="pl-8 w-full"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col space-y-1.5">
-                  <label className="text-xs text-muted font-semibold">Color Print Rate (per page) *</label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted">₹</span>
-                    <input
-                      type="number"
-                      step="0.05"
-                      value={priceColor}
-                      onChange={(e) => setPriceColor(parseFloat(e.target.value) || 0)}
-                      className="pl-8 w-full"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <label className="text-xs text-muted font-semibold">Max File Size Limit (MB) *</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={maxSize}
-                    onChange={(e) => setMaxSize(parseInt(e.target.value) || 25)}
-                    required
-                  />
-                </div>
-                <div className="flex flex-col space-y-1.5">
-                  <label className="text-xs text-muted font-semibold">Max Files Per Job *</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={maxFiles}
-                    onChange={(e) => setMaxFiles(parseInt(e.target.value) || 5)}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Checkboxes selection file formats */}
-              <div className="space-y-1.5 pt-1">
-                <label className="text-xs text-muted font-semibold">Accepted Document Formats *</label>
-                <div className="flex flex-wrap gap-3">
-                  {Object.keys(formats).map(key => (
-                    <label 
-                      key={key} 
-                      className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer text-xs font-semibold select-none transition-colors ${
-                        formats[key]
-                          ? 'bg-accent/15 border-accent text-accent'
-                          : 'bg-surface-dark border-border text-muted hover:text-white'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formats[key]}
-                        onChange={() => handleFormatsChange(key)}
-                        className="hidden"
-                      />
-                      {key}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
 
             {/* Submit Action */}
             <button

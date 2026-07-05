@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useDb } from '../../context/DbContext';
+import { api } from '../../services/api';
 import { 
   ArrowLeft, 
   User, 
@@ -72,18 +72,10 @@ const generateId = () => {
 
 const UploadPage = () => {
   const { slug } = useParams();
-  const { shops, submitPrintJob, incrementQrVisits } = useDb();
   const navigate = useNavigate();
 
-  // Find shop
-  const shop = shops.find(s => s.slug === slug);
-
-  // Increment visitor/scan count on mount
-  useEffect(() => {
-    if (shop?.id && incrementQrVisits) {
-      incrementQrVisits(shop.id);
-    }
-  }, [shop?.id]);
+  const [shop, setShop] = useState(null);
+  const [loadingShop, setLoadingShop] = useState(true);
 
   // States
   const [files, setFiles] = useState([]);
@@ -98,6 +90,33 @@ const UploadPage = () => {
   const [copied, setCopied] = useState(false);
 
   const fileInputRef = useRef(null);
+
+  // Fetch shop and Increment visitor/scan count on mount
+  useEffect(() => {
+    const fetchShop = async () => {
+      try {
+        const data = await api.getShopBySlug(slug);
+        setShop(data);
+        await api.incrementQrVisit(slug);
+      } catch (err) {
+        console.error('Failed to load shop:', err);
+      } finally {
+        setLoadingShop(false);
+      }
+    };
+    fetchShop();
+  }, [slug]);
+
+  if (loadingShop) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col justify-between">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+        </main>
+      </div>
+    );
+  }
 
   if (!shop) {
     return (
@@ -158,7 +177,8 @@ const UploadPage = () => {
         pageCount: pageCount,
         colorPrint: false, // default B&W
         copies: 1,
-        doubleSided: false
+        doubleSided: false,
+        originalFile: file
       });
     }
 
@@ -182,7 +202,7 @@ const UploadPage = () => {
     return sum + (f.pageCount * price * f.copies);
   }, 0);
 
-  const handleDirectSubmit = () => {
+  const handleDirectSubmit = async () => {
     setErrorMsg('');
 
     if (files.length === 0) {
@@ -192,29 +212,36 @@ const UploadPage = () => {
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      const response = submitPrintJob(
-        slug,
-        { 
-          fullName: "Guest Customer", 
-          phone: "Walk-in", 
-          email: "" 
-        },
-        { paperSize: 'A4', specialInstructions },
-        files
-      );
-
-      setIsSubmitting(false);
-
-      if (response.success) {
-        setSuccessData({
-          token: response.token,
-          job: response.job
+    try {
+      const formData = new FormData();
+      const options = [];
+      
+      files.forEach((fileObj) => {
+        formData.append('files', fileObj.originalFile);
+        options.push({
+          colorPrint: fileObj.colorPrint,
+          copies: fileObj.copies,
+          doubleSided: fileObj.doubleSided
         });
-      } else {
-        setErrorMsg(response.error || 'Failed to submit the print job.');
+      });
+
+      if (specialInstructions) {
+        formData.append('specialInstructions', specialInstructions);
       }
-    }, 1200);
+      formData.append('options', JSON.stringify(options));
+
+      const response = await api.submitPrintJob(slug, formData);
+      // Save slug so TrackJobPage can auto-load with just the token
+      localStorage.setItem('last_shop_slug', slug);
+      setSuccessData({
+        token: response.trackingToken || response.token || response.accessToken,
+        job: response
+      });
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to submit the print job.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const copyToClipboard = () => {
@@ -242,11 +269,11 @@ const UploadPage = () => {
           {/* Back button */}
           <div className="text-left">
             <Link 
-              to="/shops" 
+              to="/" 
               className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-white transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              Back to Shops Directory
+              Back to Home
             </Link>
           </div>
 
@@ -462,7 +489,7 @@ const UploadPage = () => {
                   <div className="flex-1 flex flex-col justify-center px-5 py-3 bg-surface-dark/40 text-left border-r border-border/40">
                     <span className="text-[10px] text-muted font-bold uppercase tracking-wider block">Total</span>
                     <span className="text-2xl font-extrabold text-[#00A884] font-mono leading-none block my-1">
-                      ₹{totalCost}
+                      ₹{totalCost.toFixed(2)}
                     </span>
                     <span className="text-[9px] text-muted block">Pay at counter</span>
                   </div>
@@ -645,10 +672,10 @@ const UploadPage = () => {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
-                  to="/shops"
+                  to="/"
                   className="flex-1 py-3 text-xs font-bold uppercase tracking-wider bg-surface-dark border border-border text-white hover:bg-primary/20 rounded-xl transition-colors"
                 >
-                  Back to Directory
+                  Back to Home
                 </Link>
               </div>
             </div>

@@ -1,78 +1,65 @@
-import React, { useState } from 'react';
-import { useDb } from '../../context/DbContext';
+import React, { useState, useEffect } from 'react';
+import { api } from '../../services/api';
 import { 
-  Search, 
   SlidersHorizontal, 
-  ChevronLeft, 
-  ChevronRight, 
-  Inbox, 
-  Eye, 
   Building,
   TrendingUp,
   Layers
 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
-import StatusBadge from '../../components/StatusBadge';
 
 const SuperJobsList = () => {
-  const { jobs, shops } = useDb();
+  const [shops, setShops] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [shopAnalytics, setShopAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   // Filters
-  const [search, setSearch] = useState('');
   const [shopFilter, setShopFilter] = useState('ALL');
-  const [statusFilter, setStatusFilter] = useState('ALL');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
-  // Filter jobs platform-wide
-  const filteredJobs = jobs.filter(job => {
-    const matchesSearch = 
-      job.customerName.toLowerCase().includes(search.toLowerCase()) || 
-      job.accessToken.toLowerCase().includes(search.toLowerCase());
-
-    const matchesShop = 
-      shopFilter === 'ALL' || 
-      job.shopId === shopFilter;
-
-    const matchesStatus = 
-      statusFilter === 'ALL' || 
-      job.status === statusFilter;
-
-    // Date filters
-    let matchesDates = true;
-    if (fromDate) {
-      matchesDates = matchesDates && job.createdAt.substring(0, 10) >= fromDate;
-    }
-    if (toDate) {
-      matchesDates = matchesDates && job.createdAt.substring(0, 10) <= toDate;
-    }
-
-    return matchesSearch && matchesShop && matchesStatus && matchesDates;
-  });
-
-  // Pagination calculation
-  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
-  const paginatedJobs = filteredJobs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const shopsData = await api.getSuperShops(0, 100);
+      setShops(shopsData.content || shopsData || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const statuses = ['ALL', 'PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED'];
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  // Live summary metrics derived from all filteredJobs (not just paginated)
-  const filteredTotalJobs = filteredJobs.length;
-  const filteredTotalRevenue = filteredJobs.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
-  const filteredTotalPages = filteredJobs.reduce((sum, j) => sum + (j.totalPages || 0), 0);
-  const filteredCompletedJobs = filteredJobs.filter(j => j.status === 'COMPLETED').length;
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setAnalyticsLoading(true);
+        let data;
+        if (shopFilter === 'ALL') {
+          data = await api.getPlatformAnalytics(fromDate, toDate);
+        } else {
+          data = await api.getSuperShopAnalytics(shopFilter, fromDate, toDate);
+        }
+        setShopAnalytics(data);
+      } catch (err) {
+        console.error('Failed to fetch analytics:', err);
+      } finally {
+        setAnalyticsLoading(false);
+      }
+    };
+    fetchAnalytics();
+  }, [shopFilter, fromDate, toDate]);
+
+  // Live summary metrics derived from server-side analytics
+  const filteredTotalJobs = shopAnalytics ? (shopAnalytics.totalJobs || 0) : 0;
+  const filteredTotalRevenue = shopAnalytics ? (shopAnalytics.totalRevenew || shopAnalytics.totalRevenue || 0) : 0;
+  const filteredTotalPages = shopAnalytics ? (shopAnalytics.totalPages || 0) : 0;
+  const filteredCompletedJobs = shopAnalytics ? (shopAnalytics.completedJobs || 0) : 0;
   const selectedShopName = shopFilter === 'ALL' ? 'All Shops' : (shops.find(s => s.id === shopFilter)?.name || 'Unknown');
 
   return (
@@ -84,7 +71,7 @@ const SuperJobsList = () => {
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
           <h1 className="text-lg font-serif font-extrabold text-white">Platform Print Jobs Auditor</h1>
-          <span className="text-xs text-muted font-bold font-mono">Platform Queue: {filteredJobs.length}</span>
+          <span className="text-xs text-muted font-bold font-mono">Platform Queue: {filteredTotalJobs}</span>
         </header>
 
         {/* Content Pane */}
@@ -92,23 +79,8 @@ const SuperJobsList = () => {
           
           {/* Platform Filters Grid */}
           <div className="bg-surface-ink border border-border p-5 rounded-2xl space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+            <div className="grid grid-cols-1 gap-4 items-center">
               
-              {/* Search Customer/Token */}
-              <div className="relative md:col-span-2">
-                <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search by customer name or job token..."
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="w-full pl-9 text-xs bg-background border border-border focus:border-accent rounded-xl py-2.5"
-                />
-              </div>
-
               {/* Shop Destination Dropdown filter */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted font-semibold uppercase flex-shrink-0">Shop:</span>
@@ -116,30 +88,12 @@ const SuperJobsList = () => {
                   value={shopFilter}
                   onChange={(e) => {
                     setShopFilter(e.target.value);
-                    setCurrentPage(1);
                   }}
-                  className="text-xs w-full"
+                  className="text-xs w-full max-w-sm"
                 >
                   <option value="ALL">All Shops</option>
                   {shops.map(s => (
                     <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Status Dropdown filter */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted font-semibold uppercase flex-shrink-0">Status:</span>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="text-xs w-full"
-                >
-                  {statuses.map(st => (
-                    <option key={st} value={st}>{st === 'ALL' ? 'All Statuses' : st}</option>
                   ))}
                 </select>
               </div>
@@ -160,7 +114,6 @@ const SuperJobsList = () => {
                     value={fromDate}
                     onChange={(e) => {
                       setFromDate(e.target.value);
-                      setCurrentPage(1);
                     }}
                     className="text-xs bg-background border border-border rounded-xl"
                   />
@@ -172,7 +125,6 @@ const SuperJobsList = () => {
                     value={toDate}
                     onChange={(e) => {
                       setToDate(e.target.value);
-                      setCurrentPage(1);
                     }}
                     className="text-xs bg-background border border-border rounded-xl"
                   />
@@ -237,83 +189,7 @@ const SuperJobsList = () => {
 
           </div>
 
-          {/* Platform Jobs Table */}
-          {filteredJobs.length === 0 ? (
-            <div className="bg-surface-ink border border-border rounded-3xl p-12 text-center space-y-4 max-w-md mx-auto py-16">
-              <div className="p-4 bg-surface-dark border border-border rounded-full w-fit mx-auto text-muted">
-                <Inbox className="w-6 h-6" />
-              </div>
-              <h3 className="text-sm font-serif font-bold text-white">No Platform Jobs Found</h3>
-              <p className="text-xs text-muted">No print jobs are currently registered matching the current platform filter bounds.</p>
-            </div>
-          ) : (
-            <div className="bg-surface-ink border border-border rounded-3xl overflow-hidden shadow-xl animate-fade-in">
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-border/60 bg-surface-dark/40 text-muted uppercase font-bold text-[10px] tracking-wider">
-                      <th className="py-4 px-4">Token</th>
-                      <th className="py-4 px-4">Customer</th>
-                      <th className="py-4 px-4">Shop Destination</th>
-                      <th className="py-4 px-4">Status</th>
-                      <th className="py-4 px-4">Pages</th>
-                      <th className="py-4 px-4">Cost Parameters</th>
-                      <th className="py-4 px-4">Created At</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/40">
-                    {paginatedJobs.map(job => (
-                      <tr key={job.id} className="hover:bg-surface-dark/30 transition-colors">
-                        <td className="py-3.5 px-4 font-mono font-bold text-accent">{job.accessToken}</td>
-                        <td className="py-3.5 px-4 font-semibold text-white">{job.customerName}</td>
-                        <td className="py-3.5 px-4 font-medium text-white flex items-center gap-1.5">
-                          <Building className="w-3.5 h-3.5 text-accent flex-shrink-0" />
-                          {job.shopName}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <StatusBadge status={job.status} />
-                        </td>
-                        <td className="py-3.5 px-4 text-muted font-medium">{job.totalPages || '—'} pages</td>
-                        <td className="py-3.5 px-4 font-mono text-white font-semibold">
-                          {job.estimatedCost !== null && job.estimatedCost !== undefined 
-                            ? `₹${job.estimatedCost.toFixed(2)}` 
-                            : 'Calculating...'}
-                        </td>
-                        <td className="py-3.5 px-4 text-muted">
-                          {new Date(job.createdAt).toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex justify-between items-center bg-surface-ink border border-border p-4 rounded-2xl max-w-sm mx-auto shadow-md">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-white disabled:opacity-40 transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              
-              <span className="text-xs text-muted font-medium">
-                Page <span className="text-white font-bold">{currentPage}</span> of <span className="text-white">{totalPages}</span>
-              </span>
-              
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-white disabled:opacity-40 transition-colors"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
 
         </main>
       </div>

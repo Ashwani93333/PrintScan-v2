@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useDb } from '../../context/DbContext';
+import { api } from '../../services/api';
 import { 
   Search, 
   RefreshCw, 
@@ -18,34 +18,64 @@ import StatusBadge from '../../components/StatusBadge';
 
 const TrackJobPage = () => {
   const { token } = useParams();
-  const { jobs, shops } = useDb();
   const navigate = useNavigate();
-  const [searchInput, setSearchInput] = useState('');
+  const [searchToken, setSearchToken] = useState('');
+  const [searchSlug, setSearchSlug] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  // Find print job
-  const job = jobs.find(j => j.accessToken?.toUpperCase() === token?.toUpperCase());
-  const shop = job ? shops.find(s => s.id === job.shopId) : null;
+  const [job, setJob] = useState(null);
+  const [shop, setShop] = useState(null);
+
+  const fetchJob = async (slugToSearch, tokenToSearch) => {
+    try {
+      setIsRefreshing(true);
+      // Fetch job directly using the shop slug and token
+      const data = await api.trackJobByToken(slugToSearch, tokenToSearch);
+      setJob(data);
+      
+      // Try to fetch shop info for UI details
+      if (data && slugToSearch) {
+        const shopData = await api.getShopBySlug(slugToSearch).catch(() => null);
+        setShop(shopData);
+      }
+    } catch (err) {
+      console.error(err);
+      setJob(null);
+      setShop(null);
+    } finally {
+      setIsRefreshing(false);
+      setLastUpdated(new Date());
+    }
+  };
 
   // Initialize search input
   useEffect(() => {
-    if (token) setSearchInput(token);
+    if (token) {
+      setSearchToken(token);
+      // If we navigate here with just a token, we might have saved the last shop slug in localStorage
+      const savedSlug = localStorage.getItem('last_shop_slug');
+      if (savedSlug) {
+        setSearchSlug(savedSlug);
+        fetchJob(savedSlug, token);
+      }
+    }
   }, [token]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchInput.trim()) {
-      navigate(`/track/${searchInput.trim().toUpperCase()}`);
+    if (searchToken.trim() && searchSlug.trim()) {
+      localStorage.setItem('last_shop_slug', searchSlug.trim().toLowerCase());
+      fetchJob(searchSlug.trim().toLowerCase(), searchToken.trim().toUpperCase());
     }
   };
 
   const triggerRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => {
-      setIsRefreshing(false);
-      setLastUpdated(new Date());
-    }, 800);
+    const currentSlug = searchSlug || localStorage.getItem('last_shop_slug');
+    const currentToken = searchToken || token;
+    if (currentSlug && currentToken) {
+      fetchJob(currentSlug, currentToken);
+    }
   };
 
   // Status Banner Configurations
@@ -107,28 +137,41 @@ const TrackJobPage = () => {
         <main className="max-w-xl mx-auto px-4 py-8 space-y-6 text-left">
           {/* Token search header bar */}
           <div className="bg-surface-ink border border-border p-4 rounded-2xl">
-            <form onSubmit={handleSearchSubmit} className="flex gap-2.5">
-              <div className="relative flex-1">
-                <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search and track token (e.g. B3K9X2)..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full pl-9 text-xs bg-background border border-border focus:border-accent rounded-xl"
-                  required
-                />
+            <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2.5">
+              <div className="flex-1 flex gap-2.5">
+                <div className="relative w-1/2">
+                  <MapPin className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Shop Handle (e.g. campus-quick-print)"
+                    value={searchSlug}
+                    onChange={(e) => setSearchSlug(e.target.value)}
+                    className="w-full pl-9 text-xs bg-background border border-border focus:border-accent rounded-xl"
+                    required
+                  />
+                </div>
+                <div className="relative w-1/2">
+                  <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Job Token (e.g. B3K9X2)"
+                    value={searchToken}
+                    onChange={(e) => setSearchToken(e.target.value)}
+                    className="w-full pl-9 text-xs bg-background border border-border focus:border-accent rounded-xl"
+                    required
+                  />
+                </div>
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 bg-accent hover:bg-accent-hover text-background text-xs font-bold rounded-xl transition-colors"
+                className="px-4 py-2 bg-accent hover:bg-accent-hover text-background text-xs font-bold rounded-xl transition-colors sm:w-auto w-full"
               >
                 Track
               </button>
             </form>
           </div>
 
-          {!token ? (
+          {(!job && !isRefreshing) ? (
             /* No search input view */
             <div className="bg-surface-ink border border-border p-8 rounded-3xl text-center space-y-4 animate-scale-in">
               <div className="p-3 bg-surface-dark border border-border rounded-full w-fit mx-auto text-accent">
@@ -150,10 +193,10 @@ const TrackJobPage = () => {
                 Token "{token}" was not found in our live database. Make sure there are no typos, or try registering a new print job.
               </p>
               <Link 
-                to="/shops"
+                to="/"
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-dark border border-border rounded-xl text-xs font-semibold text-white hover:bg-primary/20 transition-all mx-auto"
               >
-                Find a Shop
+                Go Home
               </Link>
             </div>
           ) : (
@@ -320,17 +363,17 @@ const TrackJobPage = () => {
                   {/* Print settings summary */}
                   <div className="flex justify-between py-1.5 border-b border-border/20">
                     <span className="text-muted">Color Print:</span>
-                    <span className="text-white font-semibold">{job.printOptions.colorPrint ? 'Full Color' : 'Grayscale (B&W)'}</span>
+                    <span className="text-white font-semibold">{job.colorPrint ? 'Full Color' : 'Grayscale (B&W)'}</span>
                   </div>
 
                   <div className="flex justify-between py-1.5 border-b border-border/20">
                     <span className="text-muted">Orientation & Duplex:</span>
-                    <span className="text-white font-semibold">{job.printOptions.doubleSided ? 'Double-Sided (Duplex)' : 'Single-Sided'}</span>
+                    <span className="text-white font-semibold">{job.doubleSided ? 'Double-Sided (Duplex)' : 'Single-Sided'}</span>
                   </div>
 
                   <div className="flex justify-between py-1.5 border-b border-border/20">
                     <span className="text-muted">Paper Size & Copies:</span>
-                    <span className="text-white font-semibold">{job.printOptions.paperSize} • {job.printOptions.copies} Copies</span>
+                    <span className="text-white font-semibold">{job.printOptions?.paperSize || 'A4'} • {job.copies} Copies</span>
                   </div>
 
                   {/* Estimated Cost */}
@@ -344,7 +387,7 @@ const TrackJobPage = () => {
                   </div>
 
                   {/* Special instructions blockquote */}
-                  {job.printOptions.specialInstructions && (
+                  {job.printOptions?.specialInstructions && (
                     <div className="bg-surface-dark/40 p-3.5 border-l-2 border-accent rounded-r-xl space-y-1 mt-2 text-left">
                       <span className="text-[9px] text-accent font-bold uppercase tracking-wider block">Customer Note:</span>
                       <p className="text-[11px] text-muted italic font-medium">"{job.printOptions.specialInstructions}"</p>

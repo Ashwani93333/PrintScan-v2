@@ -55,13 +55,26 @@ const ChangePasswordPage = () => {
     evaluateStrength(val);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
 
+    // Client-side validation
+    if (!currentPassword.trim()) {
+      setErrorMsg('Please enter your current password.');
+      return;
+    }
     if (newPassword.length < 8) {
       setErrorMsg('New password must be at least 8 characters long.');
+      return;
+    }
+    if (!/[A-Z]/.test(newPassword)) {
+      setErrorMsg('New password must contain at least one uppercase letter.');
+      return;
+    }
+    if (!/[0-9]/.test(newPassword)) {
+      setErrorMsg('New password must contain at least one number.');
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -70,21 +83,19 @@ const ChangePasswordPage = () => {
     }
 
     setIsPending(true);
+    // Properly await the async changePassword call
+    const response = await changePassword(currentPassword, newPassword);
+    setIsPending(false);
 
-    setTimeout(() => {
-      const response = changePassword(currentPassword, newPassword);
-      setIsPending(false);
-
-      if (response.success) {
-        setSuccessMsg('Password updated successfully!');
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-        setStrength({ score: 0, label: 'None', color: 'w-0' });
-      } else {
-        setErrorMsg(response.error || 'Failed to update password.');
-      }
-    }, 1000);
+    if (response.success) {
+      setSuccessMsg('Password updated successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setStrength({ score: 0, label: 'None', color: 'w-0' });
+    } else {
+      setErrorMsg(response.error || 'Failed to update password. Please check your current password.');
+    }
   };
 
   const isSuper = user?.role === 'SUPER_ADMIN';
@@ -158,7 +169,7 @@ const ChangePasswordPage = () => {
                 <div className="relative">
                   <input
                     type={showNew ? 'text' : 'password'}
-                    placeholder="Enter new password"
+                    placeholder="Min 8 chars, 1 uppercase, 1 number"
                     value={newPassword}
                     onChange={handlePasswordChange}
                     required
@@ -201,7 +212,7 @@ const ChangePasswordPage = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    className="w-full pr-10"
+                    className={`w-full pr-10 ${confirmPassword && confirmPassword !== newPassword ? 'border-danger' : ''}`}
                   />
                   <button
                     type="button"
@@ -211,6 +222,9 @@ const ChangePasswordPage = () => {
                     {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {confirmPassword && confirmPassword !== newPassword && (
+                  <span className="text-[10px] text-danger font-semibold">Passwords do not match</span>
+                )}
               </div>
 
               {/* Submit Action */}

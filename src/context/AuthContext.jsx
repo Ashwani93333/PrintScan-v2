@@ -1,105 +1,84 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { api } from '../services/api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  // Track if the initial session check has already run to avoid StrictMode double-fire
+  const initialized = useRef(false);
 
+  // On mount, prime the CSRF cookie first, then check the existing session.
   useEffect(() => {
-    // Check localStorage for session info
-    const storedUser = localStorage.getItem('printease_user');
-    const storedRole = localStorage.getItem('printease_role');
-    const storedToken = localStorage.getItem('printease_token');
+    if (initialized.current) return;
+    initialized.current = true;
 
-    if (storedUser && storedRole) {
-      setUser({
-        email: storedUser,
-        role: storedRole,
-        token: storedToken,
-        name: storedRole === 'SUPER_ADMIN' ? 'Super Admin' : 'Shop Manager',
-      });
-    }
-    setLoading(false);
+    let cancelled = false;
+    const checkSession = async () => {
+      try {
+        // Silently prime CSRF token — ignore errors
+        await api.csrf().catch(() => {});
+        const userData = await api.me();
+        if (!cancelled) setUser(userData);
+      } catch {
+        // 401 = no valid session — that's fine
+        if (!cancelled) setUser(null);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+    checkSession();
+    return () => { cancelled = true; };
   }, []);
 
-  const login = (email, password) => {
-    // Clean strings
-    const trimmedEmail = email.trim().toLowerCase();
-    
-    if (trimmedEmail === 'superadmin@printease.com' && password === 'SuperAdmin123!') {
-      const userData = {
-        email: trimmedEmail,
-        role: 'SUPER_ADMIN',
-        token: 'superadmin-mock-jwt-token-xyz789',
-        name: 'Super Admin',
-      };
-      localStorage.setItem('printease_user', userData.email);
-      localStorage.setItem('printease_role', userData.role);
-      localStorage.setItem('printease_token', userData.token);
-      setUser(userData);
-      return { success: true, role: 'SUPER_ADMIN' };
-    } 
-    
-    if (trimmedEmail === 'owner@printease.com' && password === 'Password123!') {
-      const userData = {
-        email: trimmedEmail,
-        role: 'ADMIN',
-        token: 'admin-mock-jwt-token-abc123',
-        name: 'Campus Quick Print Manager',
-        shopId: 'a90b4d45-ff1a-4643-982c-d9c087b322a3', // Linked to Campus Quick Print by default
-        shopSlug: 'campus-quick-print'
-      };
-      localStorage.setItem('printease_user', userData.email);
-      localStorage.setItem('printease_role', userData.role);
-      localStorage.setItem('printease_token', userData.token);
-      setUser(userData);
-      return { success: true, role: 'ADMIN' };
-    }
+  // Listen for token-expired events dispatched by api.js interceptor.
+  useEffect(() => {
+    const handleExpired = () => {
+      setUser(null);
+      // Don't redirect if we're already on the login page — that would
+      // cause an infinite hard-reload loop.
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    };
+    window.addEventListener('auth:expired', handleExpired);
+    return () => window.removeEventListener('auth:expired', handleExpired);
+  }, []);
 
-    // Dynamic login for dynamically registered shop admins
-    const registeredShops = JSON.parse(localStorage.getItem('printease_shops') || '[]');
-    const matchingShop = registeredShops.find(s => s.adminEmail?.toLowerCase() === trimmedEmail);
-    if (matchingShop && password === 'Password123!') { // Standard password for demo
-      const userData = {
-        email: trimmedEmail,
-        role: 'ADMIN',
-        token: `admin-mock-jwt-${matchingShop.id}`,
-        name: matchingShop.adminName || 'Shop Manager',
-        shopId: matchingShop.id,
-        shopSlug: matchingShop.slug
-      };
-      localStorage.setItem('printease_user', userData.email);
-      localStorage.setItem('printease_role', userData.role);
-      localStorage.setItem('printease_token', userData.token);
+  const login = async (email, password) => {
+    try {
+      await api.login(email, password);
+      const userData = await api.me();
       setUser(userData);
-      return { success: true, role: 'ADMIN' };
+      return { success: true, role: userData.role };
+    } catch (err) {
+      return { success: false, error: err.message };
     }
-
-    return { success: false, error: 'Invalid email or password.' };
   };
 
-  const logout = () => {
-    localStorage.removeItem('printease_user');
-    localStorage.removeItem('printease_role');
-    localStorage.removeItem('printease_token');
+  const logout = async () => {
+    try {
+      await api.logout();
+    } catch {
+      // Best-effort — clear local state regardless
+    }
     setUser(null);
   };
 
-  const changePassword = (currentPassword, newPassword) => {
-    // In a mock environment, we will simulate successful password updates
-    if (user.role === 'SUPER_ADMIN' && currentPassword !== 'SuperAdmin123!') {
-      return { success: false, error: 'Current password is incorrect.' };
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      await api.changePassword(currentPassword, newPassword);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
     }
-    if (user.role === 'ADMIN' && currentPassword !== 'Password123!') {
-      return { success: false, error: 'Current password is incorrect.' };
-    }
-    // Success simulation
-    return { success: true };
   };
 
+  const isAuthenticated = !!user;
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, changePassword, loading }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, changePassword, loading: isLoading }}>
       {children}
     </AuthContext.Provider>
   );

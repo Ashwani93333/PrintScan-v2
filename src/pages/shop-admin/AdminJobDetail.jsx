@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useDb } from '../../context/DbContext';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 import { 
   ArrowLeft, 
   User, 
@@ -23,18 +24,18 @@ import Toast from '../../components/Toast';
 
 const AdminJobDetail = () => {
   const { jobId } = useParams();
-  const { jobs, shops, updateJob } = useDb();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Find job
-  const job = jobs.find(j => j.id === jobId);
-  const shop = job ? shops.find(s => s.id === job.shopId) : null;
+  const [job, setJob] = useState(null);
+  const [shop, setShop] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Form states
   const [status, setStatus] = useState('');
   const [totalPages, setTotalPages] = useState('');
   const [estimatedCost, setEstimatedCost] = useState('');
-  const [adminNotes, setAdminNotes] = useState('');
+  const [staffNote, setStaffNote] = useState('');
 
   // Cancellation Modal states
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -43,230 +44,178 @@ const AdminJobDetail = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
 
-  // Load job parameters
-  useEffect(() => {
-    if (job) {
-      setStatus(job.status);
-      setTotalPages(job.totalPages || '');
-      setEstimatedCost(job.estimatedCost || '');
-      setAdminNotes(job.adminNotes || '');
+  const fetchJobDetails = async () => {
+    try {
+      setLoading(true);
+      const jobData = await api.getAdminJobDetails(jobId);
+      setJob(jobData);
+      
+      const shopId = jobData.shopId || user?.shopId;
+      if (shopId) {
+        const shopData = await api.getShopProfile(shopId);
+        setShop(shopData);
+      }
+      
+      setStatus(jobData.status);
+      setTotalPages(jobData.totalPages || '');
+      setEstimatedCost(jobData.estimatedCost || '');
+      setStaffNote(jobData.adminNotes || '');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  }, [job]);
+  };
+
+  useEffect(() => {
+    fetchJobDetails();
+  }, [jobId]);
 
   // Dynamically calculate cost based on pages input for extreme realism
   const handlePageCountChange = (e) => {
     const pagesVal = parseInt(e.target.value) || 0;
     setTotalPages(pagesVal);
 
-    if (pagesVal > 0 && shop) {
+    if (pagesVal > 0 && shop && job?.printOptions) {
       const price = job.printOptions.colorPrint 
-        ? shop.requirements.pricePerPageColor 
-        : shop.requirements.pricePerPageBW;
-      const calculated = pagesVal * price * job.printOptions.copies;
+        ? shop.requirements?.pricePerPageColor || 10
+        : shop.requirements?.pricePerPageBW || 2;
+      const calculated = pagesVal * price * (job.printOptions.copies || 1);
       setEstimatedCost(calculated.toFixed(2));
     } else {
       setEstimatedCost('');
     }
   };
 
-  const handleUpdateStatusSubmit = (e) => {
+  const handleUpdateStatusSubmit = async (e) => {
     e.preventDefault();
     if (!job) return;
 
-    updateJob(job.id, {
-      status,
-      totalPages: totalPages ? parseInt(totalPages) : null,
-      estimatedCost: estimatedCost ? parseFloat(estimatedCost) : null,
-      adminNotes
-    });
+    // Basic validation
+    if (totalPages && (isNaN(parseInt(totalPages)) || parseInt(totalPages) < 1)) {
+      setToastType('error');
+      setToastMessage('Total pages must be a positive number.');
+      return;
+    }
 
-    setToastType('success');
-    setToastMessage('Job status updated successfully!');
+    try {
+      await api.updateAdminJob(job.id, {
+        status,
+        totalPages: totalPages ? parseInt(totalPages) : null,
+        estimatedCost: estimatedCost ? parseFloat(estimatedCost) : null,
+      });
+      setToastType('success');
+      setToastMessage('Job status updated successfully!');
+      fetchJobDetails(); // refresh
+    } catch (err) {
+      setToastType('error');
+      setToastMessage(err.message || 'Failed to update job');
+    }
   };
 
-  const handleCostOverrideSubmit = (e) => {
+  const handleCostOverrideSubmit = async (e) => {
     e.preventDefault();
     if (!job) return;
 
-    updateJob(job.id, {
-      estimatedCost: estimatedCost ? parseFloat(estimatedCost) : null,
-      adminNotes
-    });
-
-    setToastType('success');
-    setToastMessage('Estimated cost override applied successfully!');
+    try {
+      await api.updateAdminJob(job.id, {
+        estimatedCost: estimatedCost ? parseFloat(estimatedCost) : null,
+      });
+      setToastType('success');
+      setToastMessage('Estimated cost override applied successfully!');
+      fetchJobDetails(); // refresh
+    } catch (err) {
+      setToastType('error');
+      setToastMessage(err.message || 'Failed to override cost');
+    }
   };
 
-  const handleDownloadFile = (fileName) => {
-    setToastType('info');
-    setToastMessage(`Downloading "${fileName}" to local spool directory...`);
-  };
-
-  const handlePrintFile = (fileName, fileObj) => {
-    setToastType('success');
-    setToastMessage(`Streaming "${fileName}" directly to your configured printer...`);
+  const handleDownloadFile = async (fileName, fileId) => {
+    try {
+      setToastType('info');
+      setToastMessage(`Downloading "${fileName}"...`);
+      
+      const blob = await api.downloadFile(fileId, 'download');
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      
+      setToastType('success');
+      setToastMessage(`Downloaded "${fileName}" successfully!`);
+    } catch (err) {
+      setToastType('error');
+      setToastMessage(err.message || 'Failed to download file');
+    }
     
-    // Open a print window for the file
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+  };
 
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Direct Print - \${fileName}</title>
-          <style>
-            body {
-              font-family: 'Sora', 'Arial', sans-serif;
-              padding: 40px;
-              color: #1A2035;
-              background-color: #ffffff;
-              text-align: center;
-            }
-            .ticket {
-              border: 3px dashed #1A2035;
-              padding: 30px;
-              max-width: 480px;
-              margin: 0 auto;
-              border-radius: 16px;
-            }
-            .brand {
-              font-size: 24px;
-              font-weight: 800;
-              color: #1A2035;
-              margin-bottom: 10px;
-            }
-            .brand span {
-              color: #E8A838;
-            }
-            .divider {
-              border-top: 2px solid #E8A838;
-              margin: 20px 0;
-            }
-            h2 {
-              font-size: 18px;
-              margin: 10px 0;
-            }
-            .meta-table {
-              width: 100%;
-              border-collapse: collapse;
-              margin: 20px 0;
-              font-size: 13px;
-              text-align: left;
-            }
-            .meta-table th, .meta-table td {
-              padding: 8px 4px;
-            }
-            .meta-table th {
-              color: #8A8FA3;
-              font-weight: 600;
-            }
-            .meta-table td {
-              color: #1A2035;
-              font-weight: 700;
-              text-align: right;
-            }
-            .footer-notes {
-              font-size: 11px;
-              color: #8A8FA3;
-              margin-top: 30px;
-              line-height: 1.4;
-            }
-            .no-print-btn {
-              margin-bottom: 20px;
-              padding: 10px 20px;
-              background-color: #E8A838;
-              color: #1A2035;
-              border: none;
-              border-radius: 8px;
-              font-weight: bold;
-              cursor: pointer;
-            }
-            @media print {
-              .no-print-btn {
-                display: none;
-              }
-              body {
-                padding: 0;
-              }
-              .ticket {
-                border: none;
-                padding: 0;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <button class="no-print-btn" onclick="window.print()">Print This Spool Ticket</button>
-          
-          <div class="ticket">
-            <div class="brand">Print<span>Ease</span></div>
-            <div class="divider"></div>
-            <h2>SPOOL DOCUMENT RECEIVED</h2>
-            
-            <table class="meta-table">
-              <tr>
-                <th>File Name</th>
-                <td>\${fileName}</td>
-              </tr>
-              <tr>
-                <th>Job Token</th>
-                <td>#\${job.accessToken}</td>
-              </tr>
-              <tr>
-                <th>Customer</th>
-                <td>\${job.customerName}</td>
-              </tr>
-              <tr>
-                <th>Pages to Print</th>
-                <td>\${fileObj.pageCount || 1} Pages</td>
-              </tr>
-              <tr>
-                <th>Mode</th>
-                <td>\${fileObj.colorPrint ? 'Full Color' : 'B&W (Grayscale)'}</td>
-              </tr>
-              <tr>
-                <th>Copies</th>
-                <td>\${fileObj.copies || 1} Copies</td>
-              </tr>
-              <tr>
-                <th>Duplexing</th>
-                <td>\${fileObj.doubleSided ? 'Double-Sided' : 'Single-Sided'}</td>
-              </tr>
-              <tr>
-                <th>Mime Type</th>
-                <td>\${fileObj.mimeType || 'application/octet-stream'}</td>
-              </tr>
-            </table>
-
-            <div class="divider"></div>
-            
-            <div class="footer-notes">
-              <strong>Spooler Engine v2.0.4</strong><br/>
-              Ensure target tray has matching paper size.
-            </div>
-          </div>
-
-          <script>
-            window.onload = function() {
-              window.print();
-            };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+  const handlePrintFile = async (fileName, fileObj) => {
+    try {
+      setToastType('info');
+      setToastMessage(`Preparing "${fileName}" for printing...`);
+      
+      // Fetch the actual file blob
+      const blob = await api.downloadFile(fileObj.id, 'inline');
+      
+      // For PDFs, make sure type is application/pdf so browsers open the native viewer
+      const fileType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : blob.type;
+      const typedBlob = new Blob([blob], { type: fileType });
+      
+      const url = window.URL.createObjectURL(typedBlob);
+      
+      const printWindow = window.open(url, '_blank');
+      if (!printWindow) {
+        setToastType('error');
+        setToastMessage('Please allow popups to open the print view.');
+        return;
+      }
+      
+      setToastType('success');
+      setToastMessage(`Opened "${fileName}" for printing!`);
+      
+      // Clean up the URL after a delay to ensure it loads in the new tab
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 60000); // 1 minute
+      
+    } catch (err) {
+      setToastType('error');
+      setToastMessage(err.message || 'Failed to prepare file for printing');
+    }
   };
 
   const triggerJobCancellation = () => {
     setConfirmOpen(true);
   };
 
-  const confirmCancellation = () => {
-    updateJob(job.id, { status: 'CANCELLED', adminNotes: 'Job cancelled by Shop Administrator.' });
-    setConfirmOpen(false);
-    setToastType('error');
-    setToastMessage('This print job has been cancelled.');
+  const confirmCancellation = async () => {
+    try {
+      await api.updateAdminJob(job.id, { status: 'CANCELLED' });
+      setConfirmOpen(false);
+      setToastType('warning');
+      setToastMessage('This print job has been cancelled.');
+      fetchJobDetails(); // refresh
+    } catch (err) {
+      setToastType('error');
+      setToastMessage(err.message || 'Failed to cancel job');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col md:flex-row">
+        <Sidebar isSuper={false} />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+        </main>
+      </div>
+    );
+  }
 
   if (!job) {
     return (
@@ -336,7 +285,7 @@ const AdminJobDetail = () => {
               </div>
 
               {/* Customer Info Card */}
-              <div className="bg-surface-ink border border-border rounded-3xl p-6 space-y-4 shadow-md">
+              {/* <div className="bg-surface-ink border border-border rounded-3xl p-6 space-y-4 shadow-md">
                 <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-2.5 flex items-center gap-2">
                   <User className="w-4.5 h-4.5 text-accent" />
                   Customer Information
@@ -355,7 +304,7 @@ const AdminJobDetail = () => {
                     <span className="text-white font-semibold block truncate">{job.customerEmail || 'Not Provided'}</span>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Print preferences summary */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 space-y-4 shadow-md">
@@ -367,19 +316,19 @@ const AdminJobDetail = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                   <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold">Color Mode</span>
-                    <span className="text-white font-bold block">{job.printOptions.colorPrint ? 'Full Color' : 'Grayscale (B&W)'}</span>
+                    <span className="text-white font-bold block">{job.colorPrint ? 'Full Color' : 'Grayscale (B&W)'}</span>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold">Duplex Layout</span>
-                    <span className="text-white font-bold block">{job.printOptions.doubleSided ? 'Double-Sided' : 'Single-Sided'}</span>
+                    <span className="text-white font-bold block">{job.doubleSided ? 'Double-Sided' : 'Single-Sided'}</span>
                   </div>
-                  <div className="space-y-1">
+                  {/* <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold">Paper Size</span>
-                    <span className="text-white font-bold block">{job.printOptions.paperSize}</span>
-                  </div>
+                    <span className="text-white font-bold block">{job.paperSize}</span>
+                  </div> */}
                   <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold">Copies</span>
-                    <span className="text-white font-bold block">{job.printOptions.copies} Copies</span>
+                    <span className="text-white font-bold block">{job.copies} Copies</span>
                   </div>
                 </div>
 
@@ -426,7 +375,7 @@ const AdminJobDetail = () => {
 
                         <div className="flex gap-2 self-start sm:self-center">
                           <button
-                            onClick={() => handleDownloadFile(file.originalName)}
+                            onClick={() => handleDownloadFile(file.originalName, file.id)}
                             className="px-3 py-1.5 bg-surface-ink hover:bg-surface-dark border border-border rounded-lg text-xs font-semibold text-white flex items-center gap-1.5 hover:text-accent hover:border-accent/40 transition-all duration-150"
                           >
                             <Download className="w-3.5 h-3.5" />
@@ -523,16 +472,15 @@ const AdminJobDetail = () => {
                     )}
                   </div>
 
-                  {/* Note textarea */}
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-xs text-muted font-semibold">Staff Notes (Visible to Customer)</label>
-                    <textarea
-                      rows="2"
-                      placeholder="e.g. Bound on glossy 120GSM..."
-                      value={adminNotes}
-                      onChange={(e) => setAdminNotes(e.target.value)}
-                    />
-                  </div>
+                  {/* Note textarea (display only — staff notes are read-only from job data) */}
+                  {staffNote && (
+                    <div className="flex flex-col space-y-1.5">
+                      <label className="text-xs text-muted font-semibold">Current Staff Note</label>
+                      <div className="p-3 bg-surface-dark border border-border rounded-xl text-xs text-muted italic">
+                        "{staffNote}"
+                      </div>
+                    </div>
+                  )}
 
                   <button
                     type="submit"

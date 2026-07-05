@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDb } from '../../context/DbContext';
+import { api } from '../../services/api';
 import { 
   Store, 
   Check, 
@@ -19,9 +19,9 @@ import Sidebar from '../../components/Sidebar';
 import StatusBadge from '../../components/StatusBadge';
 import ConfirmModal from '../../components/ConfirmModal';
 import Toast from '../../components/Toast';
+import ShopDetailModal from '../../components/ShopDetailModal';
 
 const SuperDashboard = () => {
-  const { shops, jobs, approveShop, rejectShop } = useDb();
   const navigate = useNavigate();
 
   // Dialog & Feedback states
@@ -29,24 +29,44 @@ const SuperDashboard = () => {
   const [modalAction, setModalAction] = useState({ type: '', id: '', name: '' });
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [detailShopId, setDetailShopId] = useState(null);
+
+  const [shops, setShops] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const [shopsData, analyticsData] = await Promise.all([
+        api.getSuperShops(0, 100),
+        api.getPlatformAnalytics().catch(() => ({}))
+      ]);
+      setShops(shopsData.content || shopsData || []);
+      setAnalytics(analyticsData || {});
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // Platform metrics calculation
-  const totalShops = shops.length;
-  const activeShops = shops.filter(s => s.isActive && s.isApproved).length;
+  const totalShops = analytics?.totalShops || shops.length;
+  const activeShops = analytics?.activeShops || shops.filter(s => s.isApproved).length;
   const pendingApprovals = shops.filter(s => !s.isApproved);
   const pendingShopsCount = pendingApprovals.length;
   
-  const totalJobs = jobs.length;
-  const jobsThisMonth = jobs.filter(j => j.createdAt.includes('2026-05')).length;
+  const totalJobs = analytics?.totalJobs || 0;
+  const jobsThisMonth = analytics?.jobsThisMonth || 0;
 
   // Filter pending approvals list
   const pendingList = pendingApprovals
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   // Platform jobs mini queue (last 6)
-  const recentPlatformJobs = [...jobs]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 6);
+  const recentPlatformJobs = analytics?.recentJobs || [];
 
   const handleApproveClick = (shopId, shopName) => {
     setModalAction({ type: 'APPROVE', id: shopId, name: shopName });
@@ -58,16 +78,22 @@ const SuperDashboard = () => {
     setConfirmOpen(true);
   };
 
-  const handleConfirmAction = () => {
+  const handleConfirmAction = async () => {
     setConfirmOpen(false);
-    if (modalAction.type === 'APPROVE') {
-      approveShop(modalAction.id);
-      setToastType('success');
-      setToastMessage(`Shop "${modalAction.name}" approved successfully!`);
-    } else if (modalAction.type === 'REJECT') {
-      rejectShop(modalAction.id);
+    try {
+      if (modalAction.type === 'APPROVE') {
+        await api.approveShop(modalAction.id);
+        setToastType('success');
+        setToastMessage(`Shop "${modalAction.name}" approved successfully!`);
+      } else if (modalAction.type === 'REJECT') {
+        await api.rejectShop(modalAction.id);
+        setToastType('error');
+        setToastMessage(`Shop "${modalAction.name}" registration rejected.`);
+      }
+      fetchData(); // refresh
+    } catch (err) {
       setToastType('error');
-      setToastMessage(`Shop "${modalAction.name}" registration rejected.`);
+      setToastMessage(err.message || 'Action failed.');
     }
   };
 
@@ -184,8 +210,17 @@ const SuperDashboard = () => {
               <div className="space-y-3">
                 {pendingList.map(shop => (
                   <div key={shop.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-surface-dark/60 border border-border rounded-2xl hover:border-accent/20 transition-all">
-                    <div className="space-y-1">
-                      <h4 className="text-xs font-serif font-bold text-white">{shop.name}</h4>
+                    <div 
+                      className="space-y-1 cursor-pointer group flex-1"
+                      onClick={() => {
+                        setDetailShopId(shop.id);
+                        setDetailModalOpen(true);
+                      }}
+                    >
+                      <h4 className="text-xs font-serif font-bold text-white group-hover:text-accent transition-colors flex items-center gap-1.5">
+                        {shop.name}
+                        <Eye className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </h4>
                       <p className="text-[10px] text-muted">
                         Owner: <span className="text-white font-medium">{shop.adminName}</span> ({shop.adminEmail}) • Slug: <span className="font-mono text-accent">/shops/{shop.slug}</span>
                       </p>
@@ -214,7 +249,7 @@ const SuperDashboard = () => {
             )}
           </div>
 
-          {/* Platform recent jobs list */}
+          {/* Platform recent jobs list
           <div className="bg-surface-ink border border-border rounded-3xl p-6 shadow-xl space-y-4 animate-fade-in stagger-2">
             <div className="flex justify-between items-center border-b border-border/40 pb-3">
               <h3 className="text-sm font-serif font-extrabold text-white flex items-center gap-2">
@@ -266,7 +301,7 @@ const SuperDashboard = () => {
                 </tbody>
               </table>
             </div>
-          </div>
+          </div> */}
 
         </main>
       </div>
@@ -285,6 +320,12 @@ const SuperDashboard = () => {
         onConfirm={handleConfirmAction}
         onCancel={() => setConfirmOpen(false)}
         isDanger={modalAction.type === 'REJECT'}
+      />
+
+      <ShopDetailModal
+        isOpen={detailModalOpen}
+        onClose={() => setDetailModalOpen(false)}
+        shopId={detailShopId}
       />
     </div>
   );

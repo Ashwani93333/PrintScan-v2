@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useDb } from '../../context/DbContext';
+import { api } from '../../services/api';
 import { 
   Building2, 
   UserCheck, 
@@ -17,7 +17,6 @@ import {
 import Navbar from '../../components/Navbar';
 
 const RegisterShopPage = () => {
-  const { registerShop } = useDb();
 
   // Step state
   const [step, setStep] = useState(1);
@@ -36,17 +35,7 @@ const RegisterShopPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Step 3: Rates
-  const [priceBW, setPriceBW] = useState(2.0);
-  const [priceColor, setPriceColor] = useState(10.0);
-  const [maxSize, setMaxSize] = useState(25);
-  const [maxFiles, setMaxFiles] = useState(5);
-  const [formats, setFormats] = useState({
-    PDF: true,
-    JPG: true,
-    PNG: true,
-    DOCX: true
-  });
+
 
   const [errorMsg, setErrorMsg] = useState('');
   const [isPending, setIsPending] = useState(false);
@@ -64,24 +53,34 @@ const RegisterShopPage = () => {
     }
   }, [shopName, step]);
 
-  const handleFormatsChange = (key) => {
-    setFormats(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
+
 
   const nextStep = () => {
     setErrorMsg('');
     if (step === 1) {
-      if (!shopName || !address || !phone || !email || !slug) {
+      if (!shopName.trim() || !address.trim() || !phone.trim() || !email.trim() || !slug.trim()) {
         setErrorMsg('Please complete all required fields.');
+        return;
+      }
+      // Email format validation
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setErrorMsg('Please enter a valid shop email address.');
+        return;
+      }
+      // Slug format validation
+      if (!/^[a-z0-9-]+$/.test(slug)) {
+        setErrorMsg('Slug can only contain lowercase letters, numbers, and hyphens.');
         return;
       }
     }
     if (step === 2) {
-      if (!adminName || !adminEmail || !password || !confirmPassword) {
+      if (!adminName.trim() || !adminEmail.trim() || !password || !confirmPassword) {
         setErrorMsg('Please complete all account fields.');
+        return;
+      }
+      // Admin email format validation
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) {
+        setErrorMsg('Please enter a valid admin email address.');
         return;
       }
       if (password !== confirmPassword) {
@@ -90,6 +89,14 @@ const RegisterShopPage = () => {
       }
       if (password.length < 8) {
         setErrorMsg('Password must be at least 8 characters long.');
+        return;
+      }
+      if (!/[A-Z]/.test(password)) {
+        setErrorMsg('Password must contain at least one uppercase letter.');
+        return;
+      }
+      if (!/[0-9]/.test(password)) {
+        setErrorMsg('Password must contain at least one number.');
         return;
       }
     }
@@ -101,20 +108,14 @@ const RegisterShopPage = () => {
     setStep(prev => prev - 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
-    const selectedFormats = Object.keys(formats).filter(k => formats[k]);
-    if (selectedFormats.length === 0) {
-      setErrorMsg('Please select at least one accepted file format.');
-      return;
-    }
-
     setIsPending(true);
 
-    setTimeout(() => {
-      const response = registerShop({
+    try {
+      await api.registerShop({
         name: shopName,
         address,
         phone,
@@ -123,22 +124,15 @@ const RegisterShopPage = () => {
         description,
         adminName,
         adminEmail,
-        pricePerPageBW: priceBW,
-        pricePerPageColor: priceColor,
-        maxFileSizeMb: maxSize,
-        maxFilesPerJob: maxFiles,
-        acceptedFormats: selectedFormats
+        password
       });
-
+      setRegisteredEmail(adminEmail);
+      setSubmitted(true);
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to submit registration request.');
+    } finally {
       setIsPending(false);
-
-      if (response.success) {
-        setRegisteredEmail(adminEmail);
-        setSubmitted(true);
-      } else {
-        setErrorMsg(response.error || 'Failed to submit registration request.');
-      }
-    }, 1200);
+    }
   };
 
   return (
@@ -164,8 +158,6 @@ const RegisterShopPage = () => {
                     <span className={`px-2.5 py-1 rounded-full text-xs font-mono font-bold border ${step >= 1 ? 'bg-accent text-background border-accent' : 'bg-surface-dark text-muted border-border'}`}>01</span>
                     <span className="w-8 border-t border-border"></span>
                     <span className={`px-2.5 py-1 rounded-full text-xs font-mono font-bold border ${step >= 2 ? 'bg-accent text-background border-accent' : 'bg-surface-dark text-muted border-border'}`}>02</span>
-                    <span className="w-8 border-t border-border"></span>
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-mono font-bold border ${step >= 3 ? 'bg-accent text-background border-accent' : 'bg-surface-dark text-muted border-border'}`}>03</span>
                   </div>
 
                   {/* Form Error Banners */}
@@ -318,94 +310,7 @@ const RegisterShopPage = () => {
                     </div>
                   )}
 
-                  {/* STEP 3: Pricing & constraints */}
-                  {step === 3 && (
-                    <div className="space-y-4 animate-scale-in">
-                      <h3 className="text-sm font-serif font-bold text-white flex items-center gap-2 border-b border-border/20 pb-2">
-                        <Coins className="w-4.5 h-4.5 text-accent" />
-                        Step 3 — Pricing & Restrictions
-                      </h3>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="flex flex-col space-y-1.5">
-                          <label className="text-xs text-muted font-semibold">B&W Print Rate (per page) *</label>
-                          <div className="relative">
-                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted">₹</span>
-                            <input
-                              type="number"
-                              step="0.05"
-                              value={priceBW}
-                              onChange={(e) => setPriceBW(parseFloat(e.target.value) || 0)}
-                              className="pl-8 w-full"
-                              required
-                            />
-                          </div>
-                        </div>
-                        <div className="flex flex-col space-y-1.5">
-                          <label className="text-xs text-muted font-semibold">Color Print Rate (per page) *</label>
-                          <div className="relative">
-                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted">₹</span>
-                            <input
-                              type="number"
-                              step="0.05"
-                              value={priceColor}
-                              onChange={(e) => setPriceColor(parseFloat(e.target.value) || 0)}
-                              className="pl-8 w-full"
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="flex flex-col space-y-1.5">
-                          <label className="text-xs text-muted font-semibold">Max File Size (MB) *</label>
-                          <input
-                            type="number"
-                            min="1"
-                            value={maxSize}
-                            onChange={(e) => setMaxSize(parseInt(e.target.value) || 25)}
-                            required
-                          />
-                        </div>
-                        <div className="flex flex-col space-y-1.5">
-                          <label className="text-xs text-muted font-semibold">Max Files Per Print Job *</label>
-                          <input
-                            type="number"
-                            min="1"
-                            value={maxFiles}
-                            onChange={(e) => setMaxFiles(parseInt(e.target.value) || 5)}
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      {/* File Formats selection checkboxes */}
-                      <div className="space-y-1.5 pt-1">
-                        <label className="text-xs text-muted font-semibold">Accepted File Formats *</label>
-                        <div className="flex flex-wrap gap-3">
-                          {Object.keys(formats).map(key => (
-                            <label 
-                              key={key} 
-                              className={`flex items-center gap-2 px-3 py-2 border rounded-xl cursor-pointer text-xs font-semibold select-none transition-colors ${
-                                formats[key]
-                                  ? 'bg-accent/15 border-accent text-accent'
-                                  : 'bg-surface-dark border-border text-muted hover:text-white'
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={formats[key]}
-                                onChange={() => handleFormatsChange(key)}
-                                className="hidden"
-                              />
-                              {key}
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {/* Navigation trigger button bar */}
                   <div className="flex justify-between gap-3 pt-4 border-t border-border/40 mt-6">
@@ -422,7 +327,7 @@ const RegisterShopPage = () => {
                       <div></div>
                     )}
 
-                    {step < 3 ? (
+                    {step < 2 ? (
                       <button
                         type="button"
                         onClick={nextStep}

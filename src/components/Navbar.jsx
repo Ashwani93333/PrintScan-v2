@@ -19,7 +19,6 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Find a Shop', path: '/shops' },
     { name: 'Track My Print', path: '/track/1' }, // Mocking tracking link placeholder
   ];
 

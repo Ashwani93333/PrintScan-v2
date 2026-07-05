@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useDb } from '../context/DbContext';
+import { api } from '../services/api';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -19,34 +19,47 @@ import {
 
 const Sidebar = ({ isSuper = false }) => {
   const { user, logout } = useAuth();
-  const { jobs, shops } = useDb();
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileVisible, setMobileVisible] = useState(false);
+  const [badgeCount, setBadgeCount] = useState(0);
+
+  useEffect(() => {
+    const loadBadge = async () => {
+      try {
+        if (isSuper) {
+          const res = await api.getSuperShops(0, 100);
+          const pending = (res.content || res || []).filter(s => !s.isApproved).length;
+          setBadgeCount(pending);
+        } else if (user?.shopId) {
+          const res = await api.getDashboardStats(user.shopId);
+          setBadgeCount(res.pendingJobs || 0);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    loadBadge();
+  }, [isSuper, user?.shopId]);
 
   const isActive = (path) => location.pathname === path;
 
-  // Calculate pending jobs count for badge
-  const pendingCount = jobs.filter(j => 
-    isSuper ? j.status === 'PENDING' : (j.status === 'PENDING' && j.shopId === user?.shopId)
-  ).length;
-
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 
   const adminMenu = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { name: 'Print Jobs', path: '/admin/jobs', icon: <FileText className="w-5 h-5" />, badge: pendingCount },
+    { name: 'Print Jobs', path: '/admin/jobs', icon: <FileText className="w-5 h-5" />, badge: badgeCount },
     { name: 'Shop Profile', path: '/admin/profile', icon: <Store className="w-5 h-5" /> },
     { name: 'Change Password', path: '/admin/settings/password', icon: <Settings className="w-5 h-5" /> },
   ];
 
   const superMenu = [
     { name: 'Dashboard', path: '/superadmin/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { name: 'Shops Directory', path: '/superadmin/shops', icon: <Store className="w-5 h-5" />, badge: shops.filter(s => !s.isApproved).length },
+    { name: 'Shops Directory', path: '/superadmin/shops', icon: <Store className="w-5 h-5" />, badge: badgeCount },
     { name: 'All Print Jobs', path: '/superadmin/jobs', icon: <FileText className="w-5 h-5" /> },
     { name: 'Platform Analytics', path: '/superadmin/analytics', icon: <BarChart3 className="w-5 h-5" /> },
   ];

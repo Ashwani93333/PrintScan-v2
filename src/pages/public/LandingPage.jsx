@@ -20,11 +20,19 @@ import Navbar from '../../components/Navbar';
 const LandingPage = () => {
   const navigate = useNavigate();
   const [tokenInput, setTokenInput] = useState('');
+  const [slugInput, setSlugInput] = useState('');
 
   const handleTrackSubmit = (e) => {
     e.preventDefault();
     if (tokenInput.trim()) {
       navigate(`/track/${tokenInput.trim().toUpperCase()}`);
+    }
+  };
+
+  const handleSlugSubmit = (e) => {
+    e.preventDefault();
+    if (slugInput.trim()) {
+      navigate(`/shops/${slugInput.trim().toLowerCase()}`);
     }
   };
 
@@ -54,13 +62,24 @@ const LandingPage = () => {
 
             {/* Quick Actions */}
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <Link
-                to="/shops"
-                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-accent text-background hover:bg-accent-hover font-semibold text-sm shadow-xl shadow-accent/5 hover:scale-[1.02] active:scale-95 transition-all duration-150"
-              >
-                <Search className="w-4 h-4" />
-                Find a Print Shop Near You
-              </Link>
+              {/* Upload to Shop Quick Input */}
+              <form onSubmit={handleSlugSubmit} className="relative flex-1 max-w-sm flex items-center">
+                <input
+                  type="text"
+                  placeholder="Enter Shop Slug (e.g. campus-quick-print)..."
+                  value={slugInput}
+                  onChange={(e) => setSlugInput(e.target.value)}
+                  className="w-full pr-12 pl-4 py-3.5 text-sm bg-surface-ink border border-border focus:border-accent rounded-xl text-white placeholder:text-muted"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 p-2 rounded-lg bg-accent text-background hover:bg-accent-hover transition-colors duration-150"
+                  title="Go to Upload Page"
+                >
+                  <UploadCloud className="w-4 h-4" />
+                </button>
+              </form>
               
               {/* Live Track Quick Input */}
               <form onSubmit={handleTrackSubmit} className="relative flex-1 max-w-sm flex items-center">
@@ -138,9 +157,9 @@ const LandingPage = () => {
                 <div className="p-3 w-fit bg-background rounded-xl border border-border text-accent">
                   <Compass className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-serif font-bold text-white">Find Your Shop</h3>
+                <h3 className="text-lg font-serif font-bold text-white">Enter Shop Slug</h3>
                 <p className="text-sm text-muted">
-                  Search by area or browse active local shops. View requirements, prices, and accepted formats.
+                  Know your print shop's unique handle? Enter it directly to jump straight into their upload portal.
                 </p>
               </div>
             </div>
@@ -349,8 +368,8 @@ const LandingPage = () => {
           </div>
           
           <div className="flex gap-6 text-xs text-muted">
-            <Link to="/shops" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/shops" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link to="/" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/" className="hover:text-white transition-colors">Terms of Service</Link>
             <a href="mailto:support@printease.com" className="hover:text-white transition-colors">Contact Support</a>
           </div>
 

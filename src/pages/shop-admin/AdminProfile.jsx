@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useDb } from '../../context/DbContext';
+import { api } from '../../services/api';
 import { Store, Save, Sliders, CheckSquare, ShieldCheck, Mail, Phone, Info, QrCode, Download, Copy, Printer, CheckCircle } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 import Toast from '../../components/Toast';
 
 const AdminProfile = () => {
   const { user } = useAuth();
-  const { shops, updateShopProfile } = useDb();
 
-  // Find shop
-  const shopId = user?.shopId || "a90b4d45-ff1a-4643-982c-d9c087b322a3";
-  const shop = shops.find(s => s.id === shopId);
+  const [shop, setShop] = useState(null);
+  const shopId = user?.shopId;
 
   // States
   const [name, setName] = useState('');
@@ -19,7 +17,6 @@ const AdminProfile = () => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
-  const [isActive, setIsActive] = useState(true);
 
   // Requirements states
   const [priceBW, setPriceBW] = useState(2.0);
@@ -38,29 +35,39 @@ const AdminProfile = () => {
 
   // Load shop data
   useEffect(() => {
-    if (shop) {
-      setName(shop.name);
-      setAddress(shop.address);
-      setPhone(shop.phone);
-      setEmail(shop.email);
-      setDescription(shop.description || '');
-      setIsActive(shop.isActive);
-      
-      setPriceBW(shop.requirements.pricePerPageBW);
-      setPriceColor(shop.requirements.pricePerPageColor);
-      setMaxSize(shop.requirements.maxFileSizeMb);
-      setMaxFiles(shop.requirements.maxFilesPerJob);
+    const loadShopProfile = async () => {
+      if (!shopId) return;
+      try {
+        const data = await api.getShopProfile(shopId);
+        setShop(data);
+        setName(data.name || '');
+        setAddress(data.address || '');
+        setPhone(data.phone || '');
+        setEmail(data.email || '');
+        setDescription(data.description || '');
+        
+        if (data.requirements) {
+          setPriceBW(data.requirements.pricePerPageBW || 2.0);
+          setPriceColor(data.requirements.pricePerPageColor || 10.0);
+          setMaxSize(data.requirements.maxFileSizeMb || 25);
+          setMaxFiles(data.requirements.maxFilesPerJob || 5);
 
-      // Rebuild formats dictionary
-      const currentFormats = { PDF: false, JPG: false, PNG: false, DOCX: false };
-      shop.requirements.acceptedFormats.forEach(fmt => {
-        if (currentFormats[fmt] !== undefined) {
-          currentFormats[fmt] = true;
+          if (data.requirements.acceptedFormats) {
+            const currentFormats = { PDF: false, JPG: false, PNG: false, DOCX: false };
+            data.requirements.acceptedFormats.forEach(fmt => {
+              if (currentFormats[fmt] !== undefined) {
+                currentFormats[fmt] = true;
+              }
+            });
+            setFormats(currentFormats);
+          }
         }
-      });
-      setFormats(currentFormats);
-    }
-  }, [shop]);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadShopProfile();
+  }, [shopId]);
 
   const handleFormatsChange = (key) => {
     setFormats(prev => ({
@@ -188,7 +195,7 @@ const AdminProfile = () => {
     printWindow.document.close();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const selectedFormats = Object.keys(formats).filter(k => formats[k]);
@@ -198,22 +205,27 @@ const AdminProfile = () => {
       return;
     }
 
-    updateShopProfile(shopId, {
-      name,
-      address,
-      phone,
-      email,
-      description,
-      isActive,
-      acceptedFormats: selectedFormats,
-      pricePerPageBW: parseFloat(priceBW),
-      pricePerPageColor: parseFloat(priceColor),
-      maxFileSizeMb: parseInt(maxSize),
-      maxFilesPerJob: parseInt(maxFiles)
-    });
-
-    setToastType('success');
-    setToastMessage('Shop profile changes saved successfully!');
+    try {
+      await api.updateShopProfile(shopId, {
+        name,
+        address,
+        phone,
+        email,
+        description,
+        requirements: {
+          acceptedFormats: selectedFormats,
+          pricePerPageBW: parseFloat(priceBW),
+          pricePerPageColor: parseFloat(priceColor),
+          maxFileSizeMb: parseInt(maxSize),
+          maxFilesPerJob: parseInt(maxFiles)
+        }
+      });
+      setToastType('success');
+      setToastMessage('Shop profile changes saved successfully!');
+    } catch (err) {
+      setToastType('error');
+      setToastMessage(err.message || 'Failed to update shop profile');
+    }
   };
 
   return (
@@ -237,7 +249,7 @@ const AdminProfile = () => {
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
           <h1 className="text-lg font-serif font-extrabold text-white">Configure Shop Profile</h1>
-          <span className="text-xs text-muted font-bold font-mono">ID: {shopId.substring(0, 8)}</span>
+          <span className="text-xs text-muted font-bold font-mono">ID: {shopId?.substring(0, 8) ?? '—'}</span>
         </header>
 
         {/* Content Pane */}
@@ -264,23 +276,6 @@ const AdminProfile = () => {
                       onChange={(e) => setName(e.target.value)}
                       required
                     />
-                  </div>
-                  
-                  {/* Active status Toggle switch */}
-                  <div className="flex items-center justify-between p-3.5 bg-surface-dark border border-border rounded-xl mt-auto">
-                    <div className="space-y-0.5">
-                      <span className="text-xs font-semibold text-white block">Active Status</span>
-                      <span className="text-[10px] text-muted block">Current: {isActive ? 'OPEN (Accepting Jobs)' : 'CLOSED (Hidden)'}</span>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={isActive} 
-                        onChange={(e) => setIsActive(e.target.checked)} 
-                        className="sr-only peer" 
-                      />
-                      <div className="w-9 h-5 bg-surface-ink peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-muted after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent peer-checked:after:bg-background"></div>
-                    </label>
                   </div>
                 </div>
 

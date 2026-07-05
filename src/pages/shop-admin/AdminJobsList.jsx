@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useDb } from '../../context/DbContext';
+import { api } from '../../services/api';
 import { 
   Search, 
   Eye, 
@@ -15,15 +15,17 @@ import {
 import Sidebar from '../../components/Sidebar';
 import StatusBadge from '../../components/StatusBadge';
 import ConfirmModal from '../../components/ConfirmModal';
+import Toast from '../../components/Toast';
 
 const AdminJobsList = () => {
   const { user } = useAuth();
-  const { jobs, updateJob } = useDb();
   const navigate = useNavigate();
 
   // Shop context mapping
-  const shopId = user?.shopId || "a90b4d45-ff1a-4643-982c-d9c087b322a3";
-  const shopJobs = jobs.filter(j => j.shopId === shopId);
+  const shopId = user?.shopId;
+
+  const [shopJobs, setShopJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // States
   const [search, setSearch] = useState('');
@@ -33,39 +35,43 @@ const AdminJobsList = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
 
   // Cancellation Modal states
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState(null);
 
-  // Apply filters
-  const filteredJobs = shopJobs.filter(job => {
-    const matchesSearch = 
-      job.customerName.toLowerCase().includes(search.toLowerCase()) || 
-      job.accessToken.toLowerCase().includes(search.toLowerCase());
+  // Toast feedback
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
 
-    const matchesStatus = 
-      statusFilter === 'ALL' || 
-      job.status === statusFilter;
-
-    // Date filters check
-    let matchesDates = true;
-    if (fromDate) {
-      matchesDates = matchesDates && job.createdAt.substring(0, 10) >= fromDate;
+  const fetchJobs = async () => {
+    if (!shopId) return;
+    setLoading(true);
+    try {
+      const params = {
+        page: currentPage - 1,
+        size: itemsPerPage,
+        ...(statusFilter !== 'ALL' && { status: statusFilter }),
+        ...(search && { query: search })
+      };
+      const data = await api.getAdminJobs(shopId, params);
+      setShopJobs(data.content || data || []);
+      setTotalPages(data.totalPages || 1);
+      setTotalElements(data.totalElements || (data.content || data).length || 0);
+    } catch (err) {
+      console.error(err);
+      setToastType('error');
+      setToastMessage('Failed to load jobs. Please refresh and try again.');
+    } finally {
+      setLoading(false);
     }
-    if (toDate) {
-      matchesDates = matchesDates && job.createdAt.substring(0, 10) <= toDate;
-    }
+  };
 
-    return matchesSearch && matchesStatus && matchesDates;
-  });
-
-  // Pagination calculation
-  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
-  const paginatedJobs = filteredJobs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(() => {
+    fetchJobs();
+  }, [shopId, currentPage, statusFilter, search, fromDate, toDate]);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -78,9 +84,18 @@ const AdminJobsList = () => {
     setConfirmOpen(true);
   };
 
-  const confirmCancellation = () => {
+  const confirmCancellation = async () => {
     if (selectedJobId) {
-      updateJob(selectedJobId, { status: 'CANCELLED', adminNotes: 'Cancelled by Shop Admin.' });
+      try {
+        await api.updateAdminJob(selectedJobId, { status: 'CANCELLED' });
+        setToastType('success');
+        setToastMessage('Job cancelled successfully.');
+        fetchJobs(); // refresh the list
+      } catch (err) {
+        setToastType('error');
+        setToastMessage(err.message || 'Failed to cancel job.');
+        console.error('Failed to cancel job', err);
+      }
       setConfirmOpen(false);
       setSelectedJobId(null);
     }
@@ -93,11 +108,22 @@ const AdminJobsList = () => {
       <Sidebar isSuper={false} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col text-left">
+      <div className="flex-1 flex flex-col text-left relative">
+
+        {/* Toast Feedback */}
+        {toastMessage && (
+          <div className="fixed top-6 right-6 z-50 animate-scale-in">
+            <Toast 
+              message={toastMessage} 
+              type={toastType} 
+              onClose={() => setToastMessage('')} 
+            />
+          </div>
+        )}
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
           <h1 className="text-lg font-serif font-extrabold text-white">Print Jobs Queue</h1>
-          <span className="text-xs text-muted font-bold font-mono">Records: {filteredJobs.length}</span>
+          <span className="text-xs text-muted font-bold font-mono">Records: {totalElements}</span>
         </header>
 
         {/* Content Pane */}
@@ -179,7 +205,7 @@ const AdminJobsList = () => {
           </div>
 
           {/* Jobs Table */}
-          {filteredJobs.length === 0 ? (
+          {shopJobs.length === 0 ? (
             <div className="bg-surface-ink border border-border rounded-3xl p-12 text-center space-y-4 max-w-md mx-auto py-16">
               <div className="p-4 bg-surface-dark border border-border rounded-full w-fit mx-auto text-muted">
                 <Inbox className="w-6 h-6" />
@@ -206,7 +232,7 @@ const AdminJobsList = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/40">
-                    {paginatedJobs.map(job => (
+                    {shopJobs.map(job => (
                       <tr key={job.id} className="hover:bg-surface-dark/30 transition-colors">
                         <td className="py-3.5 px-4 font-mono font-bold text-accent">{job.accessToken}</td>
                         <td className="py-3.5 px-4 font-semibold text-white">{job.customerName}</td>

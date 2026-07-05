@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDb } from '../../context/DbContext';
+import { api } from '../../services/api';
 import { 
   Search, 
   Plus, 
@@ -12,73 +12,102 @@ import {
   Check, 
   X,
   CheckCircle,
-  ToggleLeft,
-  ToggleRight
+  Ban,
+  Eye
 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar';
 import ConfirmModal from '../../components/ConfirmModal';
 import Toast from '../../components/Toast';
+import ShopDetailModal from '../../components/ShopDetailModal';
 
 const SuperShopsList = () => {
-  const { shops, approveShop, toggleShopActive, deleteShop } = useDb();
   const navigate = useNavigate();
+
+  const [shops, setShops] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Filters
   const [search, setSearch] = useState('');
-  const [activeFilter, setActiveFilter] = useState('ALL');
   const [approvedFilter, setApprovedFilter] = useState('ALL');
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const [totalPages, setTotalPages] = useState(1);
 
   // Dialog & Feedback states
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedShop, setSelectedShop] = useState({ id: '', name: '' });
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [detailShopId, setDetailShopId] = useState(null);
 
-  // Filter shops
+  const fetchShops = async () => {
+    try {
+      setLoading(true);
+      // Wait, we can fetch all or handle client side pagination if endpoint does not support filtering by query
+      // but the UI filters locally, so we'll fetch a large size and paginate locally like before
+      const data = await api.getSuperShops(0, 100);
+      setShops(data.content || data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchShops();
+  }, []);
+
   const filteredShops = shops.filter(shop => {
     const matchesSearch = 
       shop.name.toLowerCase().includes(search.toLowerCase()) || 
       shop.adminEmail.toLowerCase().includes(search.toLowerCase());
-
-    const matchesActive = 
-      activeFilter === 'ALL' || 
-      (activeFilter === 'ACTIVE' && shop.isActive) ||
-      (activeFilter === 'INACTIVE' && !shop.isActive);
 
     const matchesApproved = 
       approvedFilter === 'ALL' || 
       (approvedFilter === 'APPROVED' && shop.isApproved) ||
       (approvedFilter === 'PENDING' && !shop.isApproved);
 
-    return matchesSearch && matchesActive && matchesApproved;
+    return matchesSearch && matchesApproved;
   });
 
   // Pagination calculation
-  const totalPages = Math.ceil(filteredShops.length / itemsPerPage);
+  const totalFilteredPages = Math.ceil(filteredShops.length / itemsPerPage) || 1;
   const paginatedShops = filteredShops.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
+    if (newPage >= 1 && newPage <= totalFilteredPages) {
       setCurrentPage(newPage);
     }
   };
 
-  const handleApproveAction = (shopId, shopName) => {
-    approveShop(shopId);
-    setToastType('success');
-    setToastMessage(`Shop "${shopName}" has been approved successfully!`);
+  const handleApproveAction = async (shopId, shopName) => {
+    try {
+      await api.approveShop(shopId);
+      setToastType('success');
+      setToastMessage(`Shop "${shopName}" has been approved successfully!`);
+      fetchShops();
+    } catch (err) {
+      setToastType('error');
+      setToastMessage('Failed to approve shop.');
+    }
   };
 
-  const handleToggleActiveAction = (shopId, shopName) => {
-    toggleShopActive(shopId);
-    setToastType('info');
-    setToastMessage(`Toggled active status for "${shopName}".`);
+  const handleDisapproveAction = async (shopId, shopName) => {
+    try {
+      await api.disapproveShop(shopId);
+      setToastType('warning');
+      setToastMessage(`Shop "${shopName}" approval has been revoked.`);
+      fetchShops();
+    } catch (err) {
+      setToastType('error');
+      setToastMessage('Failed to revoke approval.');
+    }
   };
 
   const handleDeleteClick = (shopId, shopName) => {
@@ -86,12 +115,18 @@ const SuperShopsList = () => {
     setConfirmOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (selectedShop.id) {
-      deleteShop(selectedShop.id);
+      try {
+        await api.deleteShop(selectedShop.id);
+        setToastType('error');
+        setToastMessage(`Shop "${selectedShop.name}" deleted from platform database.`);
+        fetchShops();
+      } catch (err) {
+        setToastType('error');
+        setToastMessage('Failed to delete shop.');
+      }
       setConfirmOpen(false);
-      setToastType('error');
-      setToastMessage(`Shop "${selectedShop.name}" deleted from platform database.`);
     }
   };
 
@@ -148,23 +183,6 @@ const SuperShopsList = () => {
                 />
               </div>
 
-              {/* Active Filter dropdown */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted font-semibold uppercase flex-shrink-0">Active:</span>
-                <select
-                  value={activeFilter}
-                  onChange={(e) => {
-                    setActiveFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="text-xs w-full"
-                >
-                  <option value="ALL">All Shops</option>
-                  <option value="ACTIVE">Currently Active</option>
-                  <option value="INACTIVE">Inactive / Hidden</option>
-                </select>
-              </div>
-
               {/* Approved Filter dropdown */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted font-semibold uppercase flex-shrink-0">Approval:</span>
@@ -204,7 +222,6 @@ const SuperShopsList = () => {
                       <th className="py-4 px-4">Owner Name</th>
                       <th className="py-4 px-4">Owner Email</th>
                       <th className="py-4 px-4">Slug URL</th>
-                      <th className="py-4 px-4 text-center">Status</th>
                       <th className="py-4 px-4 text-center">Approved</th>
                       <th className="py-4 px-4 text-right">Actions</th>
                     </tr>
@@ -217,13 +234,6 @@ const SuperShopsList = () => {
                         <td className="py-3.5 px-4 font-mono text-muted">{shop.adminEmail}</td>
                         <td className="py-3.5 px-4 font-mono text-accent">/shops/{shop.slug}</td>
                         <td className="py-3.5 px-4 text-center">
-                          {shop.isActive ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-success/15 border border-success/20 text-success text-[10px] font-bold">ACTIVE</span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-danger/10 border border-danger/20 text-danger text-[10px] font-bold">INACTIVE</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-center">
                           {shop.isApproved ? (
                             <span className="inline-flex items-center px-2 py-0.5 rounded bg-success/10 text-success border border-success/20 text-[10px] font-bold">APPROVED</span>
                           ) : (
@@ -232,8 +242,20 @@ const SuperShopsList = () => {
                         </td>
                         <td className="py-3.5 px-4 text-right">
                           <div className="flex gap-2 justify-end items-center">
-                            {/* Approve button shortcut if pending */}
-                            {!shop.isApproved && (
+                            {/* View Shop Details */}
+                            <button
+                              onClick={() => {
+                                setDetailShopId(shop.id);
+                                setDetailModalOpen(true);
+                              }}
+                              className="p-1.5 bg-surface-dark border border-border hover:border-accent/40 rounded-lg text-muted hover:text-white transition-all"
+                              title="View Shop Details"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+
+                            {/* Approve/Disapprove Actions */}
+                            {!shop.isApproved ? (
                               <button
                                 onClick={() => handleApproveAction(shop.id, shop.name)}
                                 className="p-1.5 bg-success/10 border border-transparent hover:border-success/20 rounded-lg text-success hover:bg-success/20 transition-all"
@@ -241,20 +263,15 @@ const SuperShopsList = () => {
                               >
                                 <Check className="w-4 h-4" />
                               </button>
+                            ) : (
+                              <button
+                                onClick={() => handleDisapproveAction(shop.id, shop.name)}
+                                className="p-1.5 bg-warning/10 border border-transparent hover:border-warning/20 rounded-lg text-amber-500 hover:bg-amber-500/20 transition-all"
+                                title="Revoke Approval"
+                              >
+                                <Ban className="w-4 h-4" />
+                              </button>
                             )}
-
-                            {/* Active Toggle Switch */}
-                            <button
-                              onClick={() => handleToggleActiveAction(shop.id, shop.name)}
-                              className="p-1 text-muted hover:text-white transition-all"
-                              title={shop.isActive ? 'Deactivate Shop' : 'Activate Shop'}
-                            >
-                              {shop.isActive ? (
-                                <ToggleRight className="w-6 h-6 text-success" />
-                              ) : (
-                                <ToggleLeft className="w-6 h-6 text-muted" />
-                              )}
-                            </button>
 
                             {/* Delete Shop button */}
                             <button
@@ -275,7 +292,7 @@ const SuperShopsList = () => {
           )}
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
+          {totalFilteredPages > 1 && (
             <div className="flex justify-between items-center bg-surface-ink border border-border p-4 rounded-2xl max-w-sm mx-auto shadow-md">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -286,12 +303,12 @@ const SuperShopsList = () => {
               </button>
               
               <span className="text-xs text-muted font-medium">
-                Page <span className="text-white font-bold">{currentPage}</span> of <span className="text-white">{totalPages}</span>
+                Page <span className="text-white font-bold">{currentPage}</span> of <span className="text-white">{totalFilteredPages}</span>
               </span>
               
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalFilteredPages}
                 className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-white disabled:opacity-40 transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -312,6 +329,12 @@ const SuperShopsList = () => {
         onConfirm={confirmDelete}
         onCancel={() => setConfirmOpen(false)}
         isDanger={true}
+      />
+
+      <ShopDetailModal
+        isOpen={detailModalOpen}
+        onClose={() => setDetailModalOpen(false)}
+        shopId={detailShopId}
       />
     </div>
   );

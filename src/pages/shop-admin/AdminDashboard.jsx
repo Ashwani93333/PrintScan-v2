@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useDb } from '../../context/DbContext';
+import { api } from '../../services/api';
 import { 
   FileText, 
   Clock, 
@@ -25,67 +25,60 @@ import StatusBadge from '../../components/StatusBadge';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
-  const { jobs, shops } = useDb();
   const navigate = useNavigate();
 
+  const [shop, setShop] = useState(null);
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    totalPagesPrinted: 0,
+    totalRevenue: 0,
+    recentJobs: []
+  });
+  const [loading, setLoading] = useState(true);
+
   // Shop Context mapping
-  const shopId = user?.shopId || "a90b4d45-ff1a-4643-982c-d9c087b322a3"; // Fallback to Campus Quick Print for demo
-  const shop = shops.find(s => s.id === shopId);
-  const shopJobs = jobs.filter(j => j.shopId === shopId);
+  const shopId = user?.shopId;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!shopId) return;
+      try {
+        const [shopData, dashboardData] = await Promise.all([
+          api.getShopProfile(shopId),
+          api.getDashboardStats(shopId)
+        ]);
+        setShop(shopData);
+        if (dashboardData) setStats(dashboardData);
+      } catch (err) {
+        console.error("Failed to load dashboard data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [shopId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col md:flex-row">
+        <Sidebar isSuper={false} />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+        </main>
+      </div>
+    );
+  }
 
   // Stats calculation
-  const totalJobs = shopJobs.length;
-  const pendingJobs = shopJobs.filter(j => j.status === 'PENDING').length;
-  const completedJobs = shopJobs.filter(j => j.status === 'COMPLETED').length;
-  const cancelledJobs = shopJobs.filter(j => j.status === 'CANCELLED').length;
+  const { totalJobs, totalPagesPrinted, totalRevenue, recentJobs = [] } = stats;
   
-  // Analytics calculations
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOfWeek = new Date(startOfToday.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  // As the API only returns high-level totals and a few recent jobs,
+  // we will derive approximations for the dashboard cards from recentJobs
+  const pendingJobs = recentJobs.filter(j => j.status === 'PENDING').length;
+  const completedJobs = recentJobs.filter(j => j.status === 'COMPLETED').length;
+  const cancelledJobs = recentJobs.filter(j => j.status === 'CANCELLED').length;
 
-  // Filter jobs by date helper
-  const filterJobsByDate = (jobList, startDate) => {
-    return jobList.filter(j => new Date(j.createdAt) >= startDate);
-  };
-
-  // Completed jobs only for revenue and pages printed
-  const completedShopJobs = shopJobs.filter(j => j.status === 'COMPLETED');
-  
-  const completedToday = filterJobsByDate(completedShopJobs, startOfToday);
-  const completedThisWeek = filterJobsByDate(completedShopJobs, startOfWeek);
-  const completedThisMonth = filterJobsByDate(completedShopJobs, startOfMonth);
-
-  // Revenue calculations (completed jobs)
-  const revenueToday = completedToday.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
-  const revenueThisWeek = completedThisWeek.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
-  const revenueThisMonth = completedThisMonth.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
-  const revenueTotal = completedShopJobs.reduce((sum, j) => sum + (j.estimatedCost || 0), 0);
-
-  // Total pages printed (completed jobs)
-  const pagesToday = completedToday.reduce((sum, j) => sum + (j.totalPages || 0), 0);
-  const pagesThisMonth = completedThisMonth.reduce((sum, j) => sum + (j.totalPages || 0), 0);
-  const pagesTotal = completedShopJobs.reduce((sum, j) => sum + (j.totalPages || 0), 0);
-
-  // QR visits
   const qrVisits = shop?.qrVisits || 0;
-
-  // Jobs & Files created today
-  const jobsToday = filterJobsByDate(shopJobs, startOfToday);
-  const filesToday = jobsToday.reduce((sum, j) => sum + (j.files?.length || 0), 0);
-
-  const jobsTodayByStatus = {
-    PENDING: jobsToday.filter(j => j.status === 'PENDING').length,
-    PROCESSING: jobsToday.filter(j => j.status === 'PROCESSING').length,
-    COMPLETED: jobsToday.filter(j => j.status === 'COMPLETED').length,
-    CANCELLED: jobsToday.filter(j => j.status === 'CANCELLED').length
-  };
-  
-  // Sort and limit recent jobs (last 5)
-  const recentJobs = [...shopJobs]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5);
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
@@ -189,20 +182,16 @@ const AdminDashboard = () => {
                 
                 <div className="space-y-3">
                   <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
-                    <span className="text-xs text-muted">Today</span>
-                    <span className="font-mono text-sm text-white font-extrabold">₹{revenueToday.toFixed(2)}</span>
+                    <span className="text-xs text-muted">Total Earned</span>
+                    <span className="font-mono text-base text-success font-black">₹{totalRevenue.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
-                    <span className="text-xs text-muted">This Week</span>
-                    <span className="font-mono text-sm text-white font-extrabold">₹{revenueThisWeek.toFixed(2)}</span>
+                    <span className="text-xs text-muted">Pending Estimates</span>
+                    <span className="font-mono text-sm text-white font-extrabold">—</span>
                   </div>
                   <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
-                    <span className="text-xs text-muted">This Month</span>
-                    <span className="font-mono text-sm text-accent font-extrabold">₹{revenueThisMonth.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-end pt-0.5">
-                    <span className="text-xs text-muted font-bold">Total Earned</span>
-                    <span className="font-mono text-base text-success font-black">₹{revenueTotal.toFixed(2)}</span>
+                    <span className="text-xs text-muted">Awaiting Collection</span>
+                    <span className="font-mono text-sm text-accent font-extrabold">—</span>
                   </div>
                 </div>
               </div>
@@ -218,16 +207,8 @@ const AdminDashboard = () => {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
-                    <span className="text-xs text-muted">Pages Today</span>
-                    <span className="font-mono text-sm text-white font-bold">{pagesToday} pgs</span>
-                  </div>
-                  <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
-                    <span className="text-xs text-muted">Pages This Month</span>
-                    <span className="font-mono text-sm text-white font-bold">{pagesThisMonth} pgs</span>
-                  </div>
-                  <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
                     <span className="text-xs text-muted font-bold">Total Printed</span>
-                    <span className="font-mono text-sm text-blue-400 font-extrabold">{pagesTotal} pgs</span>
+                    <span className="font-mono text-sm text-blue-400 font-extrabold">{totalPagesPrinted} pgs</span>
                   </div>
                   <div className="flex justify-between items-end pt-0.5">
                     <span className="text-xs text-muted font-bold">QR Visits (Traffic)</span>
@@ -247,25 +228,21 @@ const AdminDashboard = () => {
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center border-b border-border/20 pb-1.5">
-                    <span className="text-xs text-muted">Files Received</span>
-                    <span className="font-mono text-sm text-white font-bold">{filesToday} files</span>
+                    <span className="text-xs text-muted">Recent Activity (Last {recentJobs.length})</span>
+                    <span className="font-mono text-sm text-white font-bold">Active</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 pt-1 text-[10px]">
                     <div className="p-2 bg-surface-ink/60 border border-border/30 rounded-lg text-left">
                       <span className="text-muted block uppercase tracking-wide text-[8px]">Pending</span>
-                      <span className="font-mono text-xs text-accent font-bold">{jobsTodayByStatus.PENDING}</span>
-                    </div>
-                    <div className="p-2 bg-surface-ink/60 border border-border/30 rounded-lg text-left">
-                      <span className="text-muted block uppercase tracking-wide text-[8px]">Processing</span>
-                      <span className="font-mono text-xs text-blue-400 font-bold">{jobsTodayByStatus.PROCESSING}</span>
+                      <span className="font-mono text-xs text-accent font-bold">{pendingJobs}</span>
                     </div>
                     <div className="p-2 bg-surface-ink/60 border border-border/30 rounded-lg text-left">
                       <span className="text-muted block uppercase tracking-wide text-[8px]">Completed</span>
-                      <span className="font-mono text-xs text-success font-bold">{jobsTodayByStatus.COMPLETED}</span>
+                      <span className="font-mono text-xs text-success font-bold">{completedJobs}</span>
                     </div>
                     <div className="p-2 bg-surface-ink/60 border border-border/30 rounded-lg text-left">
                       <span className="text-muted block uppercase tracking-wide text-[8px]">Cancelled</span>
-                      <span className="font-mono text-xs text-danger font-bold">{jobsTodayByStatus.CANCELLED}</span>
+                      <span className="font-mono text-xs text-danger font-bold">{cancelledJobs}</span>
                     </div>
                   </div>
                 </div>
