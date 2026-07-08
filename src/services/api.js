@@ -156,16 +156,7 @@ export const api = {
       body: JSON.stringify(data),
     });
   },
-  getFileDownloadUrl: (fileId, action = 'download') => {
-    return `${BASE_URL}/admin/files/${fileId}/download?action=${action}`;
-  },
-  downloadFile: async (fileId, action = 'download') => {
-    const res = await fetch(`${BASE_URL}/admin/files/${fileId}/download?action=${action}`, {
-      credentials: 'include',
-    });
-    if (!res.ok) throw new Error('File download failed');
-    return res.blob();
-  },
+
 
   // 4. Super Admin
   getPlatformAnalytics: async (from, to) => {

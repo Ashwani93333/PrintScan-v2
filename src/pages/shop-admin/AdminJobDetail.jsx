@@ -130,12 +130,16 @@ const AdminJobDetail = () => {
     }
   };
 
-  const handleDownloadFile = async (fileName, fileId) => {
+
+  const handleDownloadFile = async (fileName, fileUrl) => {
     try {
       setToastType('info');
       setToastMessage(`Downloading "${fileName}"...`);
       
-      const blob = await api.downloadFile(fileId, 'download');
+      const res = await fetch(fileUrl);
+      if (!res.ok) throw new Error("Failed to fetch file from CDN");
+      const blob = await res.blob();
+      
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -151,18 +155,17 @@ const AdminJobDetail = () => {
       setToastType('error');
       setToastMessage(err.message || 'Failed to download file');
     }
-    
   };
 
-  const handlePrintFile = async (fileName, fileObj) => {
+  const handlePrintFile = async (fileName, fileUrl) => {
     try {
       setToastType('info');
       setToastMessage(`Preparing "${fileName}" for printing...`);
       
-      // Fetch the actual file blob
-      const blob = await api.downloadFile(fileObj.id, 'inline');
+      const res = await fetch(fileUrl);
+      if (!res.ok) throw new Error("Failed to fetch file from CDN");
+      const blob = await res.blob();
       
-      // For PDFs, make sure type is application/pdf so browsers open the native viewer
       const fileType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : blob.type;
       const typedBlob = new Blob([blob], { type: fileType });
       
@@ -178,10 +181,9 @@ const AdminJobDetail = () => {
       setToastType('success');
       setToastMessage(`Opened "${fileName}" for printing!`);
       
-      // Clean up the URL after a delay to ensure it loads in the new tab
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
-      }, 60000); // 1 minute
+      }, 60000); 
       
     } catch (err) {
       setToastType('error');
@@ -375,7 +377,7 @@ const AdminJobDetail = () => {
 
                         <div className="flex gap-2 self-start sm:self-center">
                           <button
-                            onClick={() => handleDownloadFile(file.originalName, file.id)}
+                            onClick={() => handleDownloadFile(file.originalName, file.fileUrl)}
                             className="px-3 py-1.5 bg-surface-ink hover:bg-surface-dark border border-border rounded-lg text-xs font-semibold text-white flex items-center gap-1.5 hover:text-accent hover:border-accent/40 transition-all duration-150"
                           >
                             <Download className="w-3.5 h-3.5" />
@@ -383,7 +385,7 @@ const AdminJobDetail = () => {
                           </button>
                           
                           <button
-                            onClick={() => handlePrintFile(file.originalName, file)}
+                            onClick={() => handlePrintFile(file.originalName, file.fileUrl)}
                             className="px-3 py-1.5 bg-accent hover:bg-accent-hover text-background rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all duration-150"
                           >
                             <Printer className="w-3.5 h-3.5" />

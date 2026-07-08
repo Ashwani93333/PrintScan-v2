@@ -7,12 +7,21 @@ const PrivacyPolicyPage = () => {
       <Navbar />
       <div className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="bg-surface-dark border border-border rounded-2xl p-8 md:p-12 shadow-xl prose prose-invert max-w-none">
-          <h1 className="text-3xl font-serif font-extrabold text-white mb-2">Privacy Policy</h1>
-          <p className="text-muted text-sm mb-8">
-            <strong>PrintEase</strong><br />
-            Effective date: 2026-07-08<br />
-            Last updated: 2026-07-09
-          </p>
+          <div className="flex flex-col md:flex-row justify-between items-start mb-8">
+            <div>
+              <h1 className="text-3xl font-serif font-extrabold text-white mb-2 mt-0">Privacy Policy</h1>
+              <p className="text-muted text-sm mb-0">
+                <strong>PrintEase</strong><br />
+                Effective date: 2026-07-08<br />
+                Last updated: 2026-07-09
+              </p>
+            </div>
+            <div className="text-left md:text-right text-muted text-sm bg-surface-ink border border-border p-4 rounded-xl mt-4 md:mt-0">
+              <p className="mb-1 mt-0"><strong>Company Founder</strong> - Ashwani Kumar</p>
+              <p className="mb-1 mt-0"><strong>Co-Founder</strong> - Nitin Kumar</p>
+              <p className="mb-0 mt-0"><strong>Sales Manager</strong> - Deepak Pal</p>
+            </div>
+          </div>
 
           <hr className="border-border my-8" />
 
