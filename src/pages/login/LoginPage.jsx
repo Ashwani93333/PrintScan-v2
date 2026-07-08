@@ -168,13 +168,13 @@ const LoginPage = () => {
           </form>
 
           {/* Demo account notes banner */}
-          <div className="p-3 bg-surface-dark border border-border/80 rounded-xl space-y-1 text-[10px] text-muted leading-relaxed">
+          {/* <div className="p-3 bg-surface-dark border border-border/80 rounded-xl space-y-1 text-[10px] text-muted leading-relaxed">
             <span className="text-accent font-bold uppercase block tracking-wider">Demo Credentials:</span>
             <div className="flex flex-col gap-1">
               <p>• Shop Admin: <span className="text-white font-mono font-bold">owner@printease.com</span> / <span className="text-white font-mono font-bold">Password123!</span></p>
               <p>• Super Admin: <span className="text-white font-mono font-bold">superadmin@printease.com</span> / <span className="text-white font-mono font-bold">SuperAdmin123!</span></p>
             </div>
-          </div>
+          </div> */}
 
           <hr className="border-border/60" />
 
