@@ -1,6 +1,9 @@
 const BASE_URL = import.meta.env.VITE_API_URL_PROD;
 
+let memoryCsrfToken = null;
+
 const getCsrfToken = () => {
+  if (memoryCsrfToken) return memoryCsrfToken;
   const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
   if (match) {
     return decodeURIComponent(match[2]);
@@ -9,6 +12,12 @@ const getCsrfToken = () => {
 };
 
 const handleResponse = async (response, suppressAuthExpired = false) => {
+  // Capture CSRF token from response headers if present
+  const exposedCsrf = response.headers.get('X-XSRF-TOKEN');
+  if (exposedCsrf) {
+    memoryCsrfToken = exposedCsrf;
+  }
+
   if (!response.ok) {
     let errorMsg = 'An error occurred';
     try {
@@ -54,10 +63,18 @@ const fetchWithAuth = async (endpoint, options = {}, isRetry = false) => {
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
+  // Capture CSRF token from response headers if present (in case of 403 where handleResponse isn't reached immediately)
+  const exposedCsrf = response.headers.get('X-XSRF-TOKEN');
+  if (exposedCsrf) {
+    memoryCsrfToken = exposedCsrf;
+  }
+
   // On 403, the CSRF token may be stale — re-fetch it once and retry
   if (response.status === 403 && isMutation && !isRetry) {
     try {
-      await fetch(`${BASE_URL}/auth/csrf`, { credentials: 'include' });
+      const csrfResp = await fetch(`${BASE_URL}/auth/csrf`, { credentials: 'include' });
+      const newCsrf = csrfResp.headers.get('X-XSRF-TOKEN');
+      if (newCsrf) memoryCsrfToken = newCsrf;
     } catch (_) { /* ignore */ }
     return fetchWithAuth(endpoint, options, true);
   }
