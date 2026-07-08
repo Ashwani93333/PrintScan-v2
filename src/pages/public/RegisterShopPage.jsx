@@ -62,6 +62,19 @@ const RegisterShopPage = () => {
         setErrorMsg('Please complete all required fields.');
         return;
       }
+      if (shopName.trim().length < 3) {
+        setErrorMsg('Shop name must be at least 3 characters long.');
+        return;
+      }
+      if (address.trim().length < 10) {
+        setErrorMsg('Please enter a complete physical address (min 10 characters).');
+        return;
+      }
+      // Phone format validation
+      if (phone.trim().length !== 10) {
+        setErrorMsg('Phone number must be exactly 10 digits.');
+        return;
+      }
       // Email format validation
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         setErrorMsg('Please enter a valid shop email address.');
@@ -76,6 +89,10 @@ const RegisterShopPage = () => {
     if (step === 2) {
       if (!adminName.trim() || !adminEmail.trim() || !password || !confirmPassword) {
         setErrorMsg('Please complete all account fields.');
+        return;
+      }
+      if (adminName.trim().length < 3) {
+        setErrorMsg('Admin full name must be at least 3 characters long.');
         return;
       }
       // Admin email format validation
@@ -208,9 +225,9 @@ const RegisterShopPage = () => {
                           <label className="text-xs text-muted font-semibold">Shop Phone Number *</label>
                           <input
                             type="tel"
-                            placeholder="e.g. +91 98765 43210"
+                            placeholder="e.g. 9876543210"
                             value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                             required
                           />
                         </div>

@@ -60,9 +60,7 @@ const LoginPage = () => {
         
         {/* Brand logo */}
         <Link to="/" className="flex items-center gap-2 group relative z-10">
-          <div className="p-2 bg-accent/10 border border-accent/20 rounded-lg group-hover:bg-accent/20 transition-all">
-            <Printer className="w-6 h-6 text-accent animate-pulse-subtle" />
-          </div>
+          <img src="/printease-logo.jpeg" alt="PrintEase Logo" className="w-10 h-10 rounded-lg object-cover" />
           <span className="text-2xl font-serif font-extrabold text-white tracking-tight">
             Print<span className="text-accent text-glow-amber">Ease</span>
           </span>
@@ -81,7 +79,7 @@ const LoginPage = () => {
 
         {/* Footer label */}
         <div className="relative z-10 text-xs text-muted">
-          &copy; {new Date().getFullYear()} PrintEase. Enterprise Cloud.
+          &copy; {new Date().getFullYear()} PrintEase.
         </div>
       </div>
 
@@ -91,7 +89,7 @@ const LoginPage = () => {
           
           {/* Mobile brand branding */}
           <div className="flex items-center gap-2 lg:hidden mb-4 justify-center">
-            <Printer className="w-5 h-5 text-accent" />
+            <img src="/printease-logo.jpeg" alt="PrintEase Logo" className="w-8 h-8 rounded-md object-cover" />
             <span className="text-xl font-serif font-extrabold text-white">
               Print<span className="text-accent text-glow-amber">Ease</span>
             </span>
@@ -135,9 +133,9 @@ const LoginPage = () => {
                   <KeyRound className="w-3.5 h-3.5" />
                   Password
                 </label>
-                <Link to="/login" className="text-[10px] text-accent hover:underline">
+                {/* <Link to="/login" className="text-[10px] text-accent hover:underline">
                   Forgot Password?
-                </Link>
+                </Link> */}
               </div>
               <div className="relative">
                 <input

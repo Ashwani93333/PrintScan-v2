@@ -13,21 +13,57 @@ import {
   FileCheck, 
   ArrowRight,
   TrendingUp,
-  Printer
+  Printer,
+  Image,
+  FileText,
+  MessageCircle
 } from 'lucide-react';
 import Navbar from '../../components/Navbar';
+import PricingSection from '../../components/pricing/PricingSection';
+
+const TiltCard = ({ children, className }) => {
+  const [style, setStyle] = useState({});
+
+  const handleMouseMove = (e) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateX = ((y - centerY) / centerY) * -10;
+    const rotateY = ((x - centerX) / centerX) * 10;
+    
+    setStyle({
+      transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`,
+      transition: 'transform 0.1s ease-out'
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setStyle({
+      transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+      transition: 'transform 0.5s ease-out'
+    });
+  };
+
+  return (
+    <div
+      className={className}
+      style={style}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {children}
+    </div>
+  );
+};
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [tokenInput, setTokenInput] = useState('');
   const [slugInput, setSlugInput] = useState('');
-
-  const handleTrackSubmit = (e) => {
-    e.preventDefault();
-    if (tokenInput.trim()) {
-      navigate(`/track/${tokenInput.trim().toUpperCase()}`);
-    }
-  };
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   const handleSlugSubmit = (e) => {
     e.preventDefault();
@@ -48,7 +84,7 @@ const LandingPage = () => {
           <div className="lg:col-span-7 space-y-6 text-left animate-fade-up">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/25 text-accent text-xs font-semibold">
               <TrendingUp className="w-3.5 h-3.5" />
-              <span>Next-Gen Document Printing on Demand</span>
+              <span>20+ shops | 1000+ prints daily | Shop revenue</span>
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-extrabold text-white leading-[1.1] tracking-tight">
@@ -61,81 +97,110 @@ const LandingPage = () => {
             </p>
 
             {/* Quick Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <div className="flex flex-col pt-4 w-full max-w-md">
+              <label className="text-sm text-white font-medium mb-2 block">
+                Enter shop slug to upload files directly...
+              </label>
               {/* Upload to Shop Quick Input */}
-              <form onSubmit={handleSlugSubmit} className="relative flex-1 max-w-sm flex items-center">
+              <form onSubmit={handleSlugSubmit} className="relative flex items-center shadow-lg shadow-accent/10 rounded-xl">
                 <input
                   type="text"
-                  placeholder="Enter Shop Slug (e.g. campus-quick-print)..."
+                  placeholder="e.g. campus-quick-print"
                   value={slugInput}
                   onChange={(e) => setSlugInput(e.target.value)}
-                  className="w-full pr-12 pl-4 py-3.5 text-sm bg-surface-ink border border-border focus:border-accent rounded-xl text-white placeholder:text-muted"
+                  className="w-full pr-14 pl-5 py-4 text-base bg-surface-ink/80 backdrop-blur-sm border-2 border-border focus:border-accent focus:ring-4 focus:ring-accent/10 rounded-xl text-white placeholder:text-muted transition-all duration-200"
                   required
                 />
                 <button
                   type="submit"
-                  className="absolute right-2 p-2 rounded-lg bg-accent text-background hover:bg-accent-hover transition-colors duration-150"
+                  className="absolute right-2 p-3 rounded-lg bg-accent text-background hover:bg-accent-hover hover:scale-105 active:scale-95 transition-all duration-150"
                   title="Go to Upload Page"
                 >
-                  <UploadCloud className="w-4 h-4" />
-                </button>
-              </form>
-              
-              {/* Live Track Quick Input */}
-              <form onSubmit={handleTrackSubmit} className="relative flex-1 max-w-sm flex items-center">
-                <input
-                  type="text"
-                  placeholder="Enter Job Token (e.g. 1)..."
-                  value={tokenInput}
-                  onChange={(e) => setTokenInput(e.target.value)}
-                  className="w-full pr-12 text-sm bg-surface-ink border border-border focus:border-accent rounded-xl"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="absolute right-1 p-2 rounded-lg bg-surface-dark border border-border text-accent hover:text-white transition-colors duration-150"
-                >
-                  <ArrowRight className="w-4 h-4" />
+                  <UploadCloud className="w-5 h-5" />
                 </button>
               </form>
             </div>
           </div>
 
           {/* Hero Right Visuals */}
-          <div className="lg:col-span-5 flex justify-center animate-fade-in stagger-1">
-            <div className="relative w-full max-w-sm aspect-square bg-surface-ink border border-border rounded-3xl p-8 flex flex-col justify-center items-center overflow-hidden shadow-2xl">
-              {/* Decorative radial background */}
-              <div className="absolute inset-0 bg-radial-gradient from-accent/5 via-transparent to-transparent opacity-60"></div>
+          <div className="lg:col-span-5 flex justify-center relative animate-fade-in stagger-1 perspective-[1000px]">
+            {/* Soft glow behind the card */}
+            <div className="absolute inset-0 bg-accent/20 blur-[100px] -z-10 rounded-full scale-75 animate-pulse-subtle"></div>
+            
+            <TiltCard className="w-full max-w-[450px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col z-10 transform transition-transform duration-500">
               
-              {/* Abstract Industrial Printing press SVG illustration */}
-              <svg className="w-40 h-40 text-accent/80 mb-6 drop-shadow-[0_0_15px_rgba(232,168,56,0.15)] animate-pulse-subtle" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Paper feeds */}
-                <rect x="25" y="10" width="50" height="20" rx="3" fill="#1E2435" stroke="currentColor" strokeWidth="2" />
-                <line x1="35" y1="20" x2="65" y2="20" stroke="currentColor" strokeWidth="2" strokeDasharray="2 2" />
-                
-                {/* Rollers */}
-                <circle cx="50" cy="55" r="16" stroke="currentColor" strokeWidth="3" />
-                <path d="M30 55 H70" stroke="currentColor" strokeWidth="2" />
-                <circle cx="34" cy="55" r="3" fill="currentColor" />
-                <circle cx="66" cy="55" r="3" fill="currentColor" />
-                
-                {/* Printed page output */}
-                <rect x="30" y="65" width="40" height="25" rx="2" fill="#0F1117" stroke="currentColor" strokeWidth="2" />
-                <line x1="38" y1="73" x2="62" y2="73" stroke="currentColor" strokeWidth="1.5" />
-                <line x1="38" y1="78" x2="56" y2="78" stroke="currentColor" strokeWidth="1.5" />
-                <line x1="38" y1="83" x2="60" y2="83" stroke="currentColor" strokeWidth="1.5" />
-                
-                {/* Floating QR grid dot representation */}
-                <rect x="74" y="25" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.3" />
-                <rect x="18" y="60" width="6" height="6" rx="1" fill="currentColor" opacity="0.4" />
-              </svg>
-              
-              <div className="text-center space-y-1">
-                <span className="text-xs font-mono text-accent uppercase tracking-widest font-bold">PRINTEASE CLOUD v2.0</span>
-                <h4 className="text-sm font-serif font-semibold text-white">Continuous Print Dispatch</h4>
-                <p className="text-xs text-muted">Stapled, bound, color, and double-sided routing.</p>
+              {/* Window Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-50/80">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                </div>
+                <span className="text-sm font-semibold text-slate-400">Live Dashboard</span>
               </div>
-            </div>
+
+              {/* Dashboard Content */}
+              <div className="p-6 space-y-6">
+                
+                {/* Job #33 */}
+                <div className="flex items-center justify-between pb-6 border-b border-gray-50">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                      <span className="text-emerald-700 font-extrabold text-lg">#33</span>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <FileText className="w-4 h-4 text-red-500" />
+                        <span className="text-slate-700 font-bold text-sm">DBMS notes.pdf</span>
+                      </div>
+                      <div className="flex gap-2 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md">24pgs</span>
+                        <span className="px-2 py-0.5 bg-purple-100 text-purple-600 rounded-md">Color</span>
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-500 rounded-md">+3 more files</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button className="px-4 py-2 bg-[#16b38a] text-white text-sm font-bold rounded-lg shadow-md shadow-[#16b38a]/20 hover:bg-[#139c78] transition-colors">
+                    Print
+                  </button>
+                </div>
+
+                {/* Job #32 */}
+                <div className="flex items-center justify-between pb-6 border-b border-gray-50">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                      <span className="text-emerald-700 font-extrabold text-lg">#32</span>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <Image className="w-4 h-4 text-blue-500" />
+                        <span className="text-slate-700 font-bold text-sm">Admit Card.jpg</span>
+                      </div>
+                      <div className="flex gap-2 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md">1pg</span>
+                        <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md">B&W</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button className="px-4 py-2 bg-[#16b38a] text-white text-sm font-bold rounded-lg shadow-md shadow-[#16b38a]/20 hover:bg-[#139c78] transition-colors">
+                    Print
+                  </button>
+                </div>
+
+                {/* Skeleton Loader */}
+                <div className="flex items-center justify-between pt-2 opacity-60">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-slate-100 rounded-xl animate-pulse"></div>
+                    <div className="space-y-2">
+                      <div className="h-3 w-40 bg-slate-100 rounded-full animate-pulse"></div>
+                      <div className="h-2.5 w-24 bg-slate-100 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="w-16 h-8 bg-slate-100 rounded-lg animate-pulse"></div>
+                </div>
+
+              </div>
+            </TiltCard>
           </div>
           
         </div>
@@ -157,7 +222,7 @@ const LandingPage = () => {
                 <div className="p-3 w-fit bg-background rounded-xl border border-border text-accent">
                   <Compass className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-serif font-bold text-white">Enter Shop Slug</h3>
+                <h3 className="text-lg font-serif font-bold text-white">Enter Shop Handle</h3>3
                 <p className="text-sm text-muted">
                   Know your print shop's unique handle? Enter it directly to jump straight into their upload portal.
                 </p>
@@ -187,7 +252,7 @@ const LandingPage = () => {
                 </div>
                 <h3 className="text-lg font-serif font-bold text-white">Track & Collect</h3>
                 <p className="text-sm text-muted">
-                  Receive a custom 6-character token to track status. Collect from counter as soon as status indicates ready.
+                  Receive a token number to track status. Collect from counter as soon as status indicates ready.
                 </p>
               </div>
             </div>
@@ -270,6 +335,51 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Recent Jobs Section */}
+      <section className="bg-surface-ink border-y border-border py-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <h2 className="text-3xl font-serif font-extrabold text-white">Recent Uploded Files</h2>
+            {/* <p className="text-sm text-muted">Hover over the cards to see the tilt animation in action.</p> */}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: 'Physics_Notes_Ch4.pdf', pages: 12, type: 'Color', status: 'Completed' },
+              { name: 'Project_Proposal_Final.docx', pages: 5, type: 'B&W', status: 'Processing' },
+              { name: 'Event_Flyer_Draft.png', pages: 1, type: 'Color', status: 'Pending' },
+              { name: 'Lab_Report_2026.pdf', pages: 8, type: 'B&W', status: 'Completed' },
+            ].map((job, idx) => (
+              <TiltCard key={idx} className="bg-surface-dark border border-border p-6 rounded-2xl cursor-pointer shadow-lg flex flex-col justify-between h-full group">
+                <div>
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="p-3 bg-background rounded-xl border border-border text-accent group-hover:bg-accent/10 transition-colors">
+                      <FileText className="w-6 h-6" />
+                    </div>
+                    <span className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wider ${
+                      job.status === 'Completed' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
+                      job.status === 'Processing' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
+                      'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                    }`}>
+                      {job.status}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-semibold text-white mb-2 truncate" title={job.name}>{job.name}</h4>
+                </div>
+                <div className="flex items-center gap-4 text-xs text-muted mt-auto pt-4 border-t border-border/50">
+                  <span>{job.pages} Pages</span>
+                  <span>•</span>
+                  <span>{job.type}</span>
+                </div>
+              </TiltCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <PricingSection />
 
       {/* For Shop Owners Section */}
       <section className="bg-surface-ink border-t border-border py-20">
@@ -358,24 +468,65 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-background py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Printer className="w-5 h-5 text-accent" />
-            <span className="text-base font-serif font-extrabold text-white tracking-tight">
-              Print<span className="text-accent text-glow-amber">Ease</span>
-            </span>
-          </div>
-          
-          <div className="flex gap-6 text-xs text-muted">
-            <Link to="/" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/" className="hover:text-white transition-colors">Terms of Service</Link>
-            <a href="mailto:support@printease.com" className="hover:text-white transition-colors">Contact Support</a>
+      <footer className="border-t border-border bg-background py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            
+            {/* Left - Logo */}
+            <div className="flex items-center gap-2 w-full md:w-1/3 justify-center md:justify-start">
+              <img src="/printease-logo.jpeg" alt="PrintEase Logo" className="w-8 h-8 rounded-md object-cover" />
+              <span className="text-base font-serif font-extrabold text-white tracking-tight">
+                Print<span className="text-accent text-glow-amber">Ease</span>
+              </span>
+            </div>
+            
+            {/* Middle - Social Icons */}
+            <div className="flex gap-4 text-muted w-full md:w-1/3 justify-center">
+              <a href="https://instagram.com/___ashwani01" target="_blank" rel="noreferrer" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+              <a href="mailto:printease455@gmail.com" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><Mail className="w-4 h-4" /></a>
+              <a href="https://wa.me/7303028574" target="_blank" rel="noreferrer" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><MessageCircle className="w-4 h-4" /></a>
+            </div>
+            
+            {/* Right - Links */}
+            <div className="flex items-center gap-6 text-sm text-muted w-full md:w-1/3 justify-center md:justify-end">
+              <div className="relative">
+                <button 
+                  onClick={() => setIsContactOpen(!isContactOpen)}
+                  className={`transition-colors duration-200 ${isContactOpen ? 'text-accent' : 'hover:text-white'}`}
+                >
+                  Contact Support
+                </button>
+                {isContactOpen && (
+                  <div className="absolute bottom-full mb-4 right-1/2 translate-x-1/2 md:translate-x-0 md:right-0 w-64 bg-surface-dark border border-border rounded-xl shadow-2xl p-4 animate-fade-in z-50 text-left">
+                    <h4 className="text-sm font-semibold text-white mb-3 border-b border-border pb-2">Support Details</h4>
+                    <div className="space-y-3 text-xs text-muted">
+                      <a href="https://wa.me/7303028574" target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-accent transition-colors">
+                        <MessageCircle className="w-4 h-4" />
+                        <span>7303028574</span>
+                      </a>
+                      <a href="mailto:printease455@gmail.com" className="flex items-center gap-3 hover:text-accent transition-colors">
+                        <Mail className="w-4 h-4" />
+                        <span className="truncate">printease455@gmail.com</span>
+                      </a>
+                      <a href="https://instagram.com/___ashwani01" target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-accent transition-colors">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        <span>___ashwani01</span>
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            </div>
+
           </div>
 
-          <p className="text-xs text-muted">
-            &copy; {new Date().getFullYear()} PrintEase SaaS. All rights reserved.
-          </p>
+          <div className="mt-12 text-center border-t border-border/50 pt-8">
+            <p className="text-xs text-muted">
+              &copy; {new Date().getFullYear()} PrintEase SaaS. All rights reserved.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

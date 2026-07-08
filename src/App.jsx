@@ -10,6 +10,7 @@ import RegisterShopPage from './pages/public/RegisterShopPage';
 import LoginPage from './pages/login/LoginPage';
 import ChangePasswordPage from './pages/login/ChangePasswordPage';
 import NotFoundPage from './pages/public/NotFoundPage';
+import PrivacyPolicyPage from './pages/public/PrivacyPolicyPage';
 
 // Admin Pages
 import AdminDashboard from './pages/shop-admin/AdminDashboard';
@@ -57,6 +58,7 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/shops/:slug" element={<UploadPage />} />
         <Route path="/shops/:slug/upload" element={<UploadPage />} />
         <Route path="/track/:token" element={<TrackJobPage />} />

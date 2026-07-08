@@ -143,7 +143,7 @@ const TrackJobPage = () => {
                   <MapPin className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Shop Handle (e.g. campus-quick-print)"
+                    placeholder="Shop Handle (e.g. glbitm)"
                     value={searchSlug}
                     onChange={(e) => setSearchSlug(e.target.value)}
                     className="w-full pl-9 text-xs bg-background border border-border focus:border-accent rounded-xl"
@@ -153,8 +153,8 @@ const TrackJobPage = () => {
                 <div className="relative w-1/2">
                   <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
-                    type="text"
-                    placeholder="Job Token (e.g. B3K9X2)"
+                    type="number"
+                    placeholder="Job Token (e.g. 23)"
                     value={searchToken}
                     onChange={(e) => setSearchToken(e.target.value)}
                     className="w-full pl-9 text-xs bg-background border border-border focus:border-accent rounded-xl"
@@ -179,7 +179,7 @@ const TrackJobPage = () => {
               </div>
               <h2 className="text-xl font-serif font-bold text-white">Track Your Print Job</h2>
               <p className="text-xs text-muted max-w-xs mx-auto">
-                Enter the unique 6-character alphanumeric code printed on your success receipt to see live operational progress.
+                Enter the Shop-Handle & unique numeric token(e.g 23) printed on your success receipt to see live operational progress.
               </p>
             </div>
           ) : !job ? (

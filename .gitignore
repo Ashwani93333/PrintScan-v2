@@ -28,5 +28,7 @@ database.md
 backend_prompt_manifest.md
 features_guide.md
 .env.development
+.env.production
+
 
 

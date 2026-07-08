@@ -211,7 +211,7 @@ const AdminDashboard = () => {
                     <span className="font-mono text-sm text-blue-400 font-extrabold">{totalPagesPrinted} pgs</span>
                   </div>
                   <div className="flex justify-between items-end pt-0.5">
-                    <span className="text-xs text-muted font-bold">QR Visits (Traffic)</span>
+                    <span className="text-xs text-muted font-bold">Shop Visitors</span>
                     <span className="font-mono text-base text-accent font-black">{qrVisits} visits</span>
                   </div>
                 </div>

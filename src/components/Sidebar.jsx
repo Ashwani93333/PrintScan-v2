@@ -71,7 +71,7 @@ const Sidebar = ({ isSuper = false }) => {
       {/* Mobile Top Header (when sidebar is hidden on small viewports) */}
       <div className="flex md:hidden items-center justify-between px-4 h-14 bg-surface-dark border-b border-border w-full sticky top-0 z-30">
         <div className="flex items-center gap-2">
-          <Printer className="w-5 h-5 text-accent" />
+          <img src="/printease-logo.jpeg" alt="PrintEase Logo" className="w-6 h-6 rounded-md object-cover" />
           <span className="font-serif font-extrabold text-sm text-white">
             {isSuper ? 'PrintEase Super' : 'PrintEase Admin'}
           </span>

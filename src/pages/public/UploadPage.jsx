@@ -632,6 +632,11 @@ const UploadPage = () => {
                 </div>
               </div>
 
+              {/* Meme Photo attached */}
+              <div className="flex justify-center my-2">
+                <img src="/meme.jpg" alt="Success Meme" className="rounded-xl shadow-md border border-border max-h-40 object-contain w-full" />
+              </div>
+
               <div className="space-y-2">
                 <h1 className="text-2xl font-serif font-extrabold text-white">Job Submitted Successfully!</h1>
                 <p className="text-xs text-muted">
@@ -687,7 +692,6 @@ const UploadPage = () => {
       <footer className="border-t border-border bg-background py-6 mt-12 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 text-center text-xs text-muted flex flex-col sm:flex-row justify-between items-center gap-4">
         <p>&copy; {new Date().getFullYear()} PrintEase SaaS platform. All rights reserved.</p>
         <div className="flex gap-4 font-semibold">
-          <Link to="/shops" className="hover:text-white">Directory</Link>
           <Link to="/" className="hover:text-white">Home</Link>
         </div>
       </footer>
