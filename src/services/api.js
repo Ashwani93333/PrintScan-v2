@@ -82,6 +82,10 @@ const fetchWithAuth = async (endpoint, options = {}, isRetry = false) => {
   return handleResponse(response, isAuthEndpoint);
 };
 
+export const clearCsrfToken = () => {
+  memoryCsrfToken = null;
+};
+
 export const api = {
   // 1. Auth
   login: async (email, password) => {
@@ -92,6 +96,7 @@ export const api = {
     });
   },
   logout: async () => {
+    clearCsrfToken();
     return fetchWithAuth('/auth/logout', {
       method: 'POST',
     });
