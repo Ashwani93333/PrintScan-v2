@@ -383,7 +383,7 @@ const RegisterShopPage = () => {
                   <div className="p-4 bg-surface-dark border border-border rounded-2xl max-w-sm mx-auto flex gap-3 text-xs text-muted leading-relaxed text-left">
                     <Info className="w-5 h-5 text-accent flex-shrink-0" />
                     <span>
-                      Demo Mode Shortcut: You can log in as Super Admin (`superadmin@printease.com` / `SuperAdmin123!`) to approve this shop instantly!
+                     You cannot Login Until the Super Admin Approves Your Shop. Please Wait for the Approval Email Notification.
                     </span>
                   </div>
 

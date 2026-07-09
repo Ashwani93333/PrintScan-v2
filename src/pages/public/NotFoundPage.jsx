@@ -16,20 +16,19 @@ const NotFoundPage = () => {
           </div>
 
           <div className="space-y-2">
-            <span className="font-mono text-xs text-accent font-bold uppercase tracking-widest block">ERROR CODE 404</span>
-            <h1 className="text-3xl font-serif font-extrabold text-white">Out of Print Bounds</h1>
+            <h1 className="text-3xl font-serif font-extrabold text-white">Something went wrong</h1>
             <p className="text-sm text-muted leading-relaxed">
-              The page you are looking for has either been archived, deleted, or spooled incorrectly in our printing buffer.
+              The page you are looking for does not exist or has been moved. Please check the URL or return to the homepage.
             </p>
           </div>
 
           {/* Retro typewriter monospace characters visual box */}
-          <div className="p-4 bg-surface-dark border border-border rounded-xl font-mono text-[10px] text-muted leading-relaxed text-left space-y-1">
-            <p className="text-accent font-bold">// PRINT ERROR INJECTED</p>
+          {/* <div className="p-4 bg-surface-dark border border-border rounded-xl font-mono text-[10px] text-muted leading-relaxed text-left space-y-1">
+            <p className="text-accent font-bold">// Something went wrong</p>
             <p>&gt; spool_directory: /var/log/spool/errors</p>
             <p>&gt; routing_state: 404_PAGE_NOT_FOUND</p>
             <p>&gt; diagnosis: target route does not exist</p>
-          </div>
+          </div> */}
 
           <Link
             to="/"

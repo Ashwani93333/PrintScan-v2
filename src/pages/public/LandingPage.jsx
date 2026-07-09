@@ -482,8 +482,8 @@ const LandingPage = () => {
             
             {/* Middle - Social Icons */}
             <div className="flex gap-4 text-muted w-full md:w-1/3 justify-center">
-              <a href="https://instagram.com/___ashwani01" target="_blank" rel="noreferrer" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+              <a href="https://instagram.com/printease455" target="_blank" rel="noreferrer" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+              <a href="https://www.linkedin.com/in/ashwani-kumar-128240383/" target="_blank" rel="noreferrer" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
               <a href="mailto:printease455@gmail.com" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><Mail className="w-4 h-4" /></a>
               <a href="https://wa.me/7303028574" target="_blank" rel="noreferrer" className="hover:text-accent transition-colors p-2 bg-surface-ink rounded-full border border-border hover:border-accent/50"><MessageCircle className="w-4 h-4" /></a>
             </div>
@@ -509,9 +509,9 @@ const LandingPage = () => {
                         <Mail className="w-4 h-4" />
                         <span className="truncate">printease455@gmail.com</span>
                       </a>
-                      <a href="https://instagram.com/___ashwani01" target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-accent transition-colors">
+                      <a href="https://instagram.com/printease455" target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-accent transition-colors">
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                        <span>___ashwani01</span>
+                        <span>printease455</span>
                       </a>
                     </div>
                   </div>
