@@ -2,13 +2,30 @@ const BASE_URL = import.meta.env.VITE_API_URL_PROD;
 
 let memoryCsrfToken = null;
 
-const getCsrfToken = () => {
+// Tracks an in-flight /auth/csrf priming request so concurrent mutations
+// don't each fire their own priming call — they all wait on the same one.
+let _primingPromise = null;
+
+const getCsrfToken = () => memoryCsrfToken;
+
+/**
+ * Proactively fetch a fresh CSRF token from the backend and store it.
+ * Uses a shared in-flight promise so concurrent calls collapse into one.
+ */
+const primeCsrfToken = async () => {
   if (memoryCsrfToken) return memoryCsrfToken;
-  const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
-  if (match) {
-    return decodeURIComponent(match[2]);
-  }
-  return null;
+  if (_primingPromise) return _primingPromise;
+
+  _primingPromise = fetch(`${BASE_URL}/auth/csrf`, { credentials: 'include' })
+    .then((res) => {
+      const token = res.headers.get('X-XSRF-TOKEN');
+      if (token) memoryCsrfToken = token;
+      return token;
+    })
+    .catch(() => null)
+    .finally(() => { _primingPromise = null; });
+
+  return _primingPromise;
 };
 
 const handleResponse = async (response, suppressAuthExpired = false) => {
@@ -47,9 +64,24 @@ const fetchWithAuth = async (endpoint, options = {}, isRetry = false) => {
   // Auth endpoints return 401 as normal business logic (no session, bad
   // credentials). Only non-auth endpoints should force a logout redirect.
   const isAuthEndpoint = endpoint.startsWith('/auth/');
+  const isMutation = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method);
+
+  // ─── Proactive CSRF priming ──────────────────────────────────────────────
+  // Cross-origin cookies cannot be read by JS, so we cannot use document.cookie
+  // to get the XSRF-TOKEN. Instead we always read it from the X-XSRF-TOKEN
+  // response header (captured in memoryCsrfToken).
+  //
+  // If we're about to make a mutation and don't have a token yet, proactively
+  // fetch it NOW — before the request — to avoid the "click twice" problem.
+  // The /auth/csrf endpoint and login/logout are excluded from self-priming.
+  const isCsrfPrimingExempt = endpoint === '/auth/csrf' || endpoint === '/auth/login' || endpoint === '/auth/logout';
+  if (isMutation && !isCsrfPrimingExempt && !getCsrfToken() && !isRetry) {
+    await primeCsrfToken();
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   const csrfToken = getCsrfToken();
   const headers = new Headers(options.headers || {});
-  const isMutation = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method);
 
   if (isMutation && csrfToken) {
     headers.set('X-XSRF-TOKEN', csrfToken);
@@ -63,19 +95,18 @@ const fetchWithAuth = async (endpoint, options = {}, isRetry = false) => {
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
-  // Capture CSRF token from response headers if present (in case of 403 where handleResponse isn't reached immediately)
+  // Always capture CSRF token from response headers to keep memoryCsrfToken fresh.
   const exposedCsrf = response.headers.get('X-XSRF-TOKEN');
   if (exposedCsrf) {
     memoryCsrfToken = exposedCsrf;
   }
 
-  // On 403, the CSRF token may be stale — re-fetch it once and retry
+  // Safety net: if we still get a 403 on a mutation (e.g. token was stale),
+  // clear the cached token, re-prime once, and retry. This should be rare
+  // now that we prime proactively above.
   if (response.status === 403 && isMutation && !isRetry) {
-    try {
-      const csrfResp = await fetch(`${BASE_URL}/auth/csrf`, { credentials: 'include' });
-      const newCsrf = csrfResp.headers.get('X-XSRF-TOKEN');
-      if (newCsrf) memoryCsrfToken = newCsrf;
-    } catch (_) { /* ignore */ }
+    memoryCsrfToken = null;
+    await primeCsrfToken();
     return fetchWithAuth(endpoint, options, true);
   }
 
