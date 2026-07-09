@@ -30,7 +30,7 @@ const SuperAnalytics = () => {
   const [shops, setShops] = useState([]);
   const [stats, setStats] = useState({
     totalShops: 0,
-    activeShops: 0,
+    approvedShops: 0,
     totalJobs: 0,
     completedJobs: 0,
     cancelledJobs: 0,
