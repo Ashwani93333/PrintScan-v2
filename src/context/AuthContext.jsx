@@ -17,8 +17,6 @@ export const AuthProvider = ({ children }) => {
     let cancelled = false;
     const checkSession = async () => {
       try {
-        // Silently prime CSRF token — ignore errors
-        await api.csrf().catch(() => {});
         const userData = await api.me();
         if (!cancelled) setUser(userData);
       } catch {

@@ -1,40 +1,6 @@
 const BASE_URL = import.meta.env.VITE_API_URL_PROD;
 
-let memoryCsrfToken = null;
-
-// Tracks an in-flight /auth/csrf priming request so concurrent mutations
-// don't each fire their own priming call — they all wait on the same one.
-let _primingPromise = null;
-
-const getCsrfToken = () => memoryCsrfToken;
-
-/**
- * Proactively fetch a fresh CSRF token from the backend and store it.
- * Uses a shared in-flight promise so concurrent calls collapse into one.
- */
-const primeCsrfToken = async () => {
-  if (memoryCsrfToken) return memoryCsrfToken;
-  if (_primingPromise) return _primingPromise;
-
-  _primingPromise = fetch(`${BASE_URL}/auth/csrf`, { credentials: 'include' })
-    .then((res) => {
-      const token = res.headers.get('X-XSRF-TOKEN');
-      if (token) memoryCsrfToken = token;
-      return token;
-    })
-    .catch(() => null)
-    .finally(() => { _primingPromise = null; });
-
-  return _primingPromise;
-};
-
 const handleResponse = async (response, suppressAuthExpired = false) => {
-  // Capture CSRF token from response headers if present
-  const exposedCsrf = response.headers.get('X-XSRF-TOKEN');
-  if (exposedCsrf) {
-    memoryCsrfToken = exposedCsrf;
-  }
-
   if (!response.ok) {
     let errorMsg = 'An error occurred';
     try {
@@ -52,7 +18,6 @@ const handleResponse = async (response, suppressAuthExpired = false) => {
     }
     throw new Error(errorMsg);
   }
-  // Check if it's JSON
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.includes('application/json')) {
     return response.json();
@@ -60,61 +25,19 @@ const handleResponse = async (response, suppressAuthExpired = false) => {
   return response.text();
 };
 
-const fetchWithAuth = async (endpoint, options = {}, isRetry = false) => {
+const fetchWithAuth = async (endpoint, options = {}) => {
   // Auth endpoints return 401 as normal business logic (no session, bad
   // credentials). Only non-auth endpoints should force a logout redirect.
   const isAuthEndpoint = endpoint.startsWith('/auth/');
-  const isMutation = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method);
-
-  // ─── Proactive CSRF priming ──────────────────────────────────────────────
-  // Cross-origin cookies cannot be read by JS, so we cannot use document.cookie
-  // to get the XSRF-TOKEN. Instead we always read it from the X-XSRF-TOKEN
-  // response header (captured in memoryCsrfToken).
-  //
-  // If we're about to make a mutation and don't have a token yet, proactively
-  // fetch it NOW — before the request — to avoid the "click twice" problem.
-  // The /auth/csrf endpoint and login/logout are excluded from self-priming.
-  const isCsrfPrimingExempt = endpoint === '/auth/csrf' || endpoint === '/auth/login' || endpoint === '/auth/logout';
-  if (isMutation && !isCsrfPrimingExempt && !getCsrfToken() && !isRetry) {
-    await primeCsrfToken();
-  }
-  // ─────────────────────────────────────────────────────────────────────────
-
-  const csrfToken = getCsrfToken();
-  const headers = new Headers(options.headers || {});
-
-  if (isMutation && csrfToken) {
-    headers.set('X-XSRF-TOKEN', csrfToken);
-  }
 
   const config = {
     ...options,
     credentials: 'include',
-    headers,
+    headers: new Headers(options.headers || {}),
   };
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
-
-  // Always capture CSRF token from response headers to keep memoryCsrfToken fresh.
-  const exposedCsrf = response.headers.get('X-XSRF-TOKEN');
-  if (exposedCsrf) {
-    memoryCsrfToken = exposedCsrf;
-  }
-
-  // Safety net: if we still get a 403 on a mutation (e.g. token was stale),
-  // clear the cached token, re-prime once, and retry. This should be rare
-  // now that we prime proactively above.
-  if (response.status === 403 && isMutation && !isRetry) {
-    memoryCsrfToken = null;
-    await primeCsrfToken();
-    return fetchWithAuth(endpoint, options, true);
-  }
-
   return handleResponse(response, isAuthEndpoint);
-};
-
-export const clearCsrfToken = () => {
-  memoryCsrfToken = null;
 };
 
 export const api = {
@@ -127,18 +50,12 @@ export const api = {
     });
   },
   logout: async () => {
-    clearCsrfToken();
     return fetchWithAuth('/auth/logout', {
       method: 'POST',
     });
   },
   me: async () => {
     return fetchWithAuth('/auth/me');
-  },
-  // Prime the XSRF-TOKEN cookie — call this once on app startup so the backend
-  // sets the cookie before any state-mutating requests are made.
-  csrf: async () => {
-    return fetchWithAuth('/auth/csrf');
   },
   changePassword: async (currentPassword, newPassword) => {
     return fetchWithAuth('/auth/change-password', {
@@ -209,7 +126,6 @@ export const api = {
       body: JSON.stringify(data),
     });
   },
-
 
   // 4. Super Admin
   getPlatformAnalytics: async (from, to) => {
