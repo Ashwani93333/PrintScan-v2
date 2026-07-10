@@ -70,7 +70,7 @@ const SuperJobsList = () => {
       <div className="flex-1 flex flex-col text-left">
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
-          <h1 className="text-lg font-serif font-extrabold text-white">Platform Print Jobs Auditor</h1>
+          <h1 className="text-lg font-serif font-extrabold text-text-primary">Platform Print Jobs Auditor</h1>
           <span className="text-xs text-muted font-bold font-mono">Platform Queue: {filteredTotalJobs}</span>
         </header>
 
@@ -141,7 +141,7 @@ const SuperJobsList = () => {
             <div className="bg-surface-ink border border-border rounded-2xl p-4 flex items-center justify-between gap-3 shadow-md hover:border-accent/30 transition-all">
               <div className="space-y-0.5">
                 <span className="text-[9px] text-muted font-bold uppercase tracking-widest block">Jobs Matched</span>
-                <span className="text-2xl font-black text-white font-mono block">{filteredTotalJobs}</span>
+                <span className="text-2xl font-black text-text-primary font-mono block">{filteredTotalJobs}</span>
                 <span className="text-[9px] text-muted block">{selectedShopName}</span>
               </div>
               <div className="p-2.5 bg-surface-dark border border-border rounded-xl text-blue-400">

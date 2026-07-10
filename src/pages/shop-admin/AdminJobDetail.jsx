@@ -224,7 +224,7 @@ const AdminJobDetail = () => {
       <div className="min-h-screen bg-background flex flex-col md:flex-row">
         <Sidebar isSuper={false} />
         <main className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
-          <h2 className="text-2xl font-serif font-bold text-white">Job Not Found</h2>
+          <h2 className="text-2xl font-serif font-bold text-text-primary">Job Not Found</h2>
           <Link to="/admin/jobs" className="text-accent underline">Back to Print Queue</Link>
         </main>
       </div>
@@ -254,11 +254,11 @@ const AdminJobDetail = () => {
           <div className="flex items-center gap-4">
             <Link 
               to="/admin/jobs" 
-              className="p-1.5 hover:bg-surface-dark border border-transparent hover:border-border rounded-lg text-muted hover:text-white transition-all"
+              className="p-1.5 hover:bg-surface-dark border border-transparent hover:border-border rounded-lg text-muted hover:text-text-primary transition-all"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
-            <h1 className="text-lg font-serif font-extrabold text-white">Job #{job.accessToken} Detail</h1>
+            <h1 className="text-lg font-serif font-extrabold text-text-primary">Job #{job.accessToken} Detail</h1>
           </div>
           <span className="text-xs text-muted font-mono">{job.id.substring(0, 8)}</span>
         </header>
@@ -275,7 +275,7 @@ const AdminJobDetail = () => {
                 <div className="space-y-1">
                   <span className="text-[10px] text-muted font-bold tracking-wider block">CURRENT STEP STATUS</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-2xl font-extrabold text-white">#{job.accessToken}</span>
+                    <span className="font-mono text-2xl font-extrabold text-text-primary">#{job.accessToken}</span>
                     <StatusBadge status={job.status} />
                   </div>
                 </div>
@@ -288,29 +288,29 @@ const AdminJobDetail = () => {
 
               {/* Customer Info Card */}
               {/* <div className="bg-surface-ink border border-border rounded-3xl p-6 space-y-4 shadow-md">
-                <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-2.5 flex items-center gap-2">
+                <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-2.5 flex items-center gap-2">
                   <User className="w-4.5 h-4.5 text-accent" />
                   Customer Information
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                   <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold tracking-wider">Full Name</span>
-                    <span className="text-white font-semibold block">{job.customerName}</span>
+                    <span className="text-text-primary font-semibold block">{job.customerName}</span>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold tracking-wider">Phone</span>
-                    <span className="text-white font-semibold font-mono block">{job.customerPhone}</span>
+                    <span className="text-text-primary font-semibold font-mono block">{job.customerPhone}</span>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold tracking-wider">Email</span>
-                    <span className="text-white font-semibold block truncate">{job.customerEmail || 'Not Provided'}</span>
+                    <span className="text-text-primary font-semibold block truncate">{job.customerEmail || 'Not Provided'}</span>
                   </div>
                 </div>
               </div> */}
 
               {/* Print preferences summary */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 space-y-4 shadow-md">
-                <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-2.5 flex items-center gap-2">
+                <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-2.5 flex items-center gap-2">
                   <Printer className="w-4.5 h-4.5 text-accent" />
                   Orientation Options
                 </h3>
@@ -318,19 +318,19 @@ const AdminJobDetail = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                   <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold">Color Mode</span>
-                    <span className="text-white font-bold block">{job.colorPrint ? 'Full Color' : 'Grayscale (B&W)'}</span>
+                    <span className="text-text-primary font-bold block">{job.colorPrint ? 'Full Color' : 'Grayscale (B&W)'}</span>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold">Duplex Layout</span>
-                    <span className="text-white font-bold block">{job.doubleSided ? 'Double-Sided' : 'Single-Sided'}</span>
+                    <span className="text-text-primary font-bold block">{job.doubleSided ? 'Double-Sided' : 'Single-Sided'}</span>
                   </div>
                   {/* <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold">Paper Size</span>
-                    <span className="text-white font-bold block">{job.paperSize}</span>
+                    <span className="text-text-primary font-bold block">{job.paperSize}</span>
                   </div> */}
                   <div className="space-y-1">
                     <span className="text-muted block uppercase text-[9px] font-bold">Copies</span>
-                    <span className="text-white font-bold block">{job.copies} Copies</span>
+                    <span className="text-text-primary font-bold block">{job.copies} Copies</span>
                   </div>
                 </div>
 
@@ -344,7 +344,7 @@ const AdminJobDetail = () => {
 
               {/* Uploaded Documents List */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 space-y-4 shadow-md">
-                <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-2.5 flex items-center gap-2">
+                <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-2.5 flex items-center gap-2">
                   <FileText className="w-4.5 h-4.5 text-accent" />
                   Transmitted Files ({job.files?.length})
                 </h3>
@@ -363,7 +363,7 @@ const AdminJobDetail = () => {
                         <div className="flex items-start gap-3 min-w-0">
                           <FileText className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                           <div className="min-w-0 text-left">
-                            <span className="text-xs font-semibold text-white truncate block max-w-[200px] sm:max-w-[400px]">
+                            <span className="text-xs font-semibold text-text-primary truncate block max-w-[200px] sm:max-w-[400px]">
                               {file.originalName}
                             </span>
                             <span className="text-[10px] text-muted block mt-0.5">
@@ -378,7 +378,7 @@ const AdminJobDetail = () => {
                         <div className="flex gap-2 self-start sm:self-center">
                           <button
                             onClick={() => handleDownloadFile(file.originalName, file.fileUrl)}
-                            className="px-3 py-1.5 bg-surface-ink hover:bg-surface-dark border border-border rounded-lg text-xs font-semibold text-white flex items-center gap-1.5 hover:text-accent hover:border-accent/40 transition-all duration-150"
+                            className="px-3 py-1.5 bg-surface-ink hover:bg-surface-dark border border-border rounded-lg text-xs font-semibold text-text-primary flex items-center gap-1.5 hover:text-accent hover:border-accent/40 transition-all duration-150"
                           >
                             <Download className="w-3.5 h-3.5" />
                             Download
@@ -405,7 +405,7 @@ const AdminJobDetail = () => {
               
               {/* Job Status Controller */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 text-left space-y-4 shadow-xl">
-                <h3 className="text-sm font-serif font-extrabold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+                <h3 className="text-sm font-serif font-extrabold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                   <Settings className="w-4.5 h-4.5 text-accent" />
                   Job Operations
                 </h3>
@@ -414,7 +414,7 @@ const AdminJobDetail = () => {
                 <div className="p-3.5 bg-surface-dark/80 border border-border rounded-2xl space-y-2 text-xs">
                   <div className="flex justify-between items-center">
                     <span className="text-muted font-medium">Total Print Pages:</span>
-                    <span className="text-white font-bold font-mono bg-surface-ink px-2 py-0.5 rounded border border-border">
+                    <span className="text-text-primary font-bold font-mono bg-surface-ink px-2 py-0.5 rounded border border-border">
                       {job.totalPages || 0} Pages
                     </span>
                   </div>

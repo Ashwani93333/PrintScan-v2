@@ -122,7 +122,7 @@ const AdminJobsList = () => {
         )}
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
-          <h1 className="text-lg font-serif font-extrabold text-white">Print Jobs Queue</h1>
+          <h1 className="text-lg font-serif font-extrabold text-text-primary">Print Jobs Queue</h1>
           <span className="text-xs text-muted font-bold font-mono">Records: {totalElements}</span>
         </header>
 
@@ -193,7 +193,7 @@ const AdminJobsList = () => {
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-150 ${
                       statusFilter === st
                         ? 'bg-accent border-accent text-background font-bold'
-                        : 'bg-background border-border text-muted hover:text-white'
+                        : 'bg-background border-border text-muted hover:text-text-primary'
                     }`}
                   >
                     {st}
@@ -211,7 +211,7 @@ const AdminJobsList = () => {
                 <Inbox className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-sm font-serif font-bold text-white">No Print Jobs Found</h3>
+                <h3 className="text-sm font-serif font-bold text-text-primary">No Print Jobs Found</h3>
                 <p className="text-xs text-muted max-w-xs mx-auto">No print requests found matching the current search parameters.</p>
               </div>
             </div>
@@ -235,7 +235,7 @@ const AdminJobsList = () => {
                     {shopJobs.map(job => (
                       <tr key={job.id} className="hover:bg-surface-dark/30 transition-colors">
                         <td className="py-3.5 px-4 font-mono font-bold text-accent">{job.accessToken}</td>
-                        <td className="py-3.5 px-4 font-semibold text-white">{job.customerName}</td>
+                        <td className="py-3.5 px-4 font-semibold text-text-primary">{job.customerName}</td>
                         <td className="py-3.5 px-4 font-mono text-muted">{job.customerPhone}</td>
                         <td className="py-3.5 px-4">
                           <StatusBadge status={job.status} />
@@ -243,7 +243,7 @@ const AdminJobsList = () => {
                         <td className="py-3.5 px-4 text-muted font-medium">
                           {job.totalPages !== null && job.totalPages !== undefined ? `${job.totalPages} pgs` : '—'} ({job.files?.length || 0} files)
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-white font-semibold">
+                        <td className="py-3.5 px-4 font-mono text-text-primary font-semibold">
                           {job.estimatedCost !== null && job.estimatedCost !== undefined 
                             ? `₹${job.estimatedCost.toFixed(2)}` 
                             : '—'}
@@ -255,7 +255,7 @@ const AdminJobsList = () => {
                           <div className="flex gap-1.5 justify-end">
                             <button
                               onClick={() => navigate(`/admin/jobs/${job.id}`)}
-                              className="p-1.5 bg-surface-dark border border-border hover:border-accent/40 rounded-lg text-muted hover:text-white transition-all"
+                              className="p-1.5 bg-surface-dark border border-border hover:border-accent/40 rounded-lg text-muted hover:text-text-primary transition-all"
                               title="View/Update Details"
                             >
                               <Eye className="w-4 h-4" />
@@ -285,19 +285,19 @@ const AdminJobsList = () => {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-white disabled:opacity-40 transition-colors"
+                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-text-primary disabled:opacity-40 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               
               <span className="text-xs text-muted font-medium">
-                Page <span className="text-white font-bold">{currentPage}</span> of <span className="text-white">{totalPages}</span>
+                Page <span className="text-text-primary font-bold">{currentPage}</span> of <span className="text-text-primary">{totalPages}</span>
               </span>
               
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-white disabled:opacity-40 transition-colors"
+                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-text-primary disabled:opacity-40 transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

@@ -61,7 +61,7 @@ const LoginPage = () => {
         {/* Brand logo */}
         <Link to="/" className="flex items-center gap-2 group relative z-10">
           <img src="/printease-logo.jpeg" alt="PrintEase Logo" className="w-10 h-10 rounded-lg object-cover" />
-          <span className="text-2xl font-serif font-extrabold text-white tracking-tight">
+          <span className="text-2xl font-serif font-extrabold text-text-primary tracking-tight">
             Print<span className="text-accent text-glow-amber">Ease</span>
           </span>
         </Link>
@@ -69,7 +69,7 @@ const LoginPage = () => {
         {/* Dynamic center visuals */}
         <div className="space-y-6 max-w-md relative z-10 animate-fade-up">
           <span className="text-xs font-mono text-accent uppercase tracking-widest font-bold">MANAGEMENT TERMINAL v2.0</span>
-          <h2 className="text-4xl sm:text-5xl font-serif font-extrabold text-white leading-tight">
+          <h2 className="text-4xl sm:text-5xl font-serif font-extrabold text-text-primary leading-tight">
             Optimize Your Counter.
           </h2>
           <p className="text-base text-muted leading-relaxed">
@@ -90,13 +90,13 @@ const LoginPage = () => {
           {/* Mobile brand branding */}
           <div className="flex items-center gap-2 lg:hidden mb-4 justify-center">
             <img src="/printease-logo.jpeg" alt="PrintEase Logo" className="w-8 h-8 rounded-md object-cover" />
-            <span className="text-xl font-serif font-extrabold text-white">
+            <span className="text-xl font-serif font-extrabold text-text-primary">
               Print<span className="text-accent text-glow-amber">Ease</span>
             </span>
           </div>
 
           <div className="space-y-1.5 text-center lg:text-left">
-            <h2 className="text-2xl font-serif font-extrabold text-white">Welcome Back</h2>
+            <h2 className="text-2xl font-serif font-extrabold text-text-primary">Welcome Back</h2>
             <p className="text-xs text-muted">Sign in to manage your local print shop queue.</p>
           </div>
 
@@ -149,7 +149,7 @@ const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text-primary transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -171,8 +171,8 @@ const LoginPage = () => {
           {/* <div className="p-3 bg-surface-dark border border-border/80 rounded-xl space-y-1 text-[10px] text-muted leading-relaxed">
             <span className="text-accent font-bold uppercase block tracking-wider">Demo Credentials:</span>
             <div className="flex flex-col gap-1">
-              <p>• Shop Admin: <span className="text-white font-mono font-bold">owner@printease.com</span> / <span className="text-white font-mono font-bold">Password123!</span></p>
-              <p>• Super Admin: <span className="text-white font-mono font-bold">superadmin@printease.com</span> / <span className="text-white font-mono font-bold">SuperAdmin123!</span></p>
+              <p>• Shop Admin: <span className="text-text-primary font-mono font-bold">owner@printease.com</span> / <span className="text-text-primary font-mono font-bold">Password123!</span></p>
+              <p>• Super Admin: <span className="text-text-primary font-mono font-bold">superadmin@printease.com</span> / <span className="text-text-primary font-mono font-bold">SuperAdmin123!</span></p>
             </div>
           </div> */}
 

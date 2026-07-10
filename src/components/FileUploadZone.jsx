@@ -133,7 +133,7 @@ const FileUploadZone = ({ acceptedFormats = [], maxFileSizeMb = 25, maxFiles = 5
           <div className="p-3 bg-surface-dark rounded-full border border-border text-muted hover:text-accent transition-colors duration-200">
             <Upload className="w-6 h-6" />
           </div>
-          <p className="text-sm font-semibold text-white">
+          <p className="text-sm font-semibold text-text-primary">
             Drag & drop files here or <span className="text-accent underline">browse</span>
           </p>
           <p className="text-xs text-muted">
@@ -165,7 +165,7 @@ const FileUploadZone = ({ acceptedFormats = [], maxFileSizeMb = 25, maxFiles = 5
                         <FileText className="w-5 h-5 text-blue-400 flex-shrink-0" />
                       )}
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-white truncate max-w-[240px] md:max-w-[400px]">
+                        <p className="text-xs font-medium text-text-primary truncate max-w-[240px] md:max-w-[400px]">
                           {fileObj.name}
                         </p>
                         <p className="text-[10px] text-muted">

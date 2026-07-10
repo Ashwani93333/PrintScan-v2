@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X, Printer, User, LogOut, ShieldAlert, MessageCircle, Mail } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { Menu, X, Printer, User, LogOut, ShieldAlert, MessageCircle, Mail, Sun, Moon } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -31,7 +33,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2 group">
               <img src="/printease-logo.jpeg" alt="PrintEase Logo" className="w-10 h-10 rounded-lg object-cover" />
-              <span className="text-xl font-serif font-extrabold text-white tracking-tight">
+              <span className="text-xl font-serif font-extrabold text-text-primary tracking-tight">
                 Print<span className="text-accent text-glow-amber">Ease</span>
               </span>
             </Link>
@@ -54,7 +56,7 @@ const Navbar = () => {
                 className={`text-sm font-medium transition-colors duration-200 ${
                   isActive(link.path) 
                     ? 'text-accent border-b border-accent pb-1' 
-                    : 'text-muted hover:text-white'
+                    : 'text-muted hover:text-text-primary'
                 }`}
               >
                 {link.name}
@@ -64,7 +66,7 @@ const Navbar = () => {
 
           {/* Desktop Right Panel (Auth & Actions) */}
           <div className="hidden md:flex items-center gap-4">
-            <a href="https://maps.app.goo.gl/mK4Tu4jduiumxGB7A?g_st=aw" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 bg-surface-ink border border-border hover:border-accent/40 rounded-lg text-xs font-semibold text-white transition-all">
+            <a href="https://maps.app.goo.gl/mK4Tu4jduiumxGB7A?g_st=aw" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-1.5 bg-surface-ink border border-border hover:border-accent/40 rounded-lg text-xs font-semibold text-text-primary transition-all">
               <svg viewBox="0 0 24 24" className="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -73,12 +75,22 @@ const Navbar = () => {
               </svg>
               Find us on Google
             </a>
+            
+            {/* Theme Toggle Desktop */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted hover:text-text-primary hover:bg-surface-dark border border-transparent hover:border-border transition-all duration-150"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+
             {user ? (
               <div className="flex items-center gap-3">
                 {/* Dynamic Role Badge */}
                 <Link
                   to={user.role === 'SUPER_ADMIN' ? '/superadmin/dashboard' : '/admin/dashboard'}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary border border-border hover:border-accent/40 text-xs font-semibold text-white transition-all duration-200"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary border border-border hover:border-accent/40 text-xs font-semibold text-text-primary transition-all duration-200"
                 >
                   {user.role === 'SUPER_ADMIN' ? (
                     <ShieldAlert className="w-4 h-4 text-accent" />
@@ -99,7 +111,7 @@ const Navbar = () => {
               <div className="flex items-center gap-3">
                 <Link
                   to="/register"
-                  className="px-4 py-2 text-sm font-semibold rounded-lg bg-surface-ink border border-border text-white hover:bg-primary/20 hover:border-accent/30 transition-all duration-200"
+                  className="px-4 py-2 text-sm font-semibold rounded-lg bg-surface-ink border border-border text-text-primary hover:bg-primary/20 hover:border-accent/30 transition-all duration-200"
                 >
                   Register Your Shop
                 </Link>
@@ -113,11 +125,18 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile hamburger menu button */}
-          <div className="flex md:hidden">
+          {/* Mobile hamburger menu button & Theme toggle */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted hover:text-text-primary hover:bg-surface-dark border border-transparent hover:border-border transition-all duration-150"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 rounded-lg text-muted hover:text-white hover:bg-surface-dark border border-transparent hover:border-border transition-all duration-150"
+              className="p-2 rounded-lg text-muted hover:text-text-primary hover:bg-surface-dark border border-transparent hover:border-border transition-all duration-150"
             >
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -144,7 +163,7 @@ const Navbar = () => {
               className={`block px-3 py-2 rounded-lg text-base font-semibold ${
                 isActive(link.path)
                   ? 'bg-accent/10 text-accent border-l-2 border-accent'
-                  : 'text-muted hover:text-white hover:bg-surface-ink'
+                  : 'text-muted hover:text-text-primary hover:bg-surface-ink'
               }`}
             >
               {link.name}
@@ -154,7 +173,7 @@ const Navbar = () => {
           <hr className="border-border my-2" />
           
           <div className="py-1">
-            <a href="https://maps.app.goo.gl/mK4Tu4jduiumxGB7A?g_st=aw" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white hover:bg-surface-ink rounded-lg transition-colors">
+            <a href="https://maps.app.goo.gl/mK4Tu4jduiumxGB7A?g_st=aw" target="_blank" rel="noreferrer" className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-text-primary hover:bg-surface-ink rounded-lg transition-colors">
               <svg viewBox="0 0 24 24" className="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -171,7 +190,7 @@ const Navbar = () => {
               <Link
                 to={user.role === 'SUPER_ADMIN' ? '/superadmin/dashboard' : '/admin/dashboard'}
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-primary border border-border font-semibold text-sm text-white"
+                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-primary border border-border font-semibold text-sm text-text-primary"
               >
                 Dashboard Panel
               </Link>
@@ -188,7 +207,7 @@ const Navbar = () => {
               <Link
                 to="/register"
                 onClick={() => setMobileOpen(false)}
-                className="block text-center w-full px-4 py-2.5 rounded-lg bg-surface-ink border border-border font-semibold text-sm text-white"
+                className="block text-center w-full px-4 py-2.5 rounded-lg bg-surface-ink border border-border font-semibold text-sm text-text-primary"
               >
                 Register Your Shop
               </Link>

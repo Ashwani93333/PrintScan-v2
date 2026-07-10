@@ -12,11 +12,11 @@ const ConfirmModal = ({ isOpen, title, message, confirmText = 'Confirm', cancelT
             <div className={`p-2 rounded-lg ${isDanger ? 'bg-danger/10 text-danger' : 'bg-amber-500/10 text-amber-500'}`}>
               <AlertTriangle className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-serif font-bold text-white">{title}</h3>
+            <h3 className="text-lg font-serif font-bold text-text-primary">{title}</h3>
           </div>
           <button 
             onClick={onCancel}
-            className="text-muted hover:text-white transition-colors duration-150"
+            className="text-muted hover:text-text-primary transition-colors duration-150"
           >
             <X className="w-5 h-5" />
           </button>
@@ -29,13 +29,13 @@ const ConfirmModal = ({ isOpen, title, message, confirmText = 'Confirm', cancelT
         <div className="flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-semibold rounded-lg bg-surface-ink border border-border text-white hover:bg-primary/20 transition-all duration-150"
+            className="px-4 py-2 text-sm font-semibold rounded-lg bg-surface-ink border border-border text-text-primary hover:bg-primary/20 transition-all duration-150"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 text-sm font-semibold rounded-lg text-white transition-all duration-150 ${
+            className={`px-4 py-2 text-sm font-semibold rounded-lg text-text-primary transition-all duration-150 ${
               isDanger 
                 ? 'bg-danger hover:bg-danger/85 hover:shadow-lg hover:shadow-danger/10' 
                 : 'bg-accent hover:bg-accent/85 hover:shadow-lg hover:shadow-accent/10 text-background'

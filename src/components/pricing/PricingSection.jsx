@@ -35,7 +35,7 @@ const PricingSection = () => {
     <>
       <section id="pricing" className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <h2 className="text-3xl font-serif font-extrabold text-white">Simple, Transparent Pricing</h2>
+          <h2 className="text-3xl font-serif font-extrabold text-text-primary">Simple, Transparent Pricing</h2>
           <p className="text-sm text-muted">Choose the perfect plan for your printing needs.</p>
         </div>
 

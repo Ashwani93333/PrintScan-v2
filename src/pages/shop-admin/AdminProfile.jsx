@@ -248,7 +248,7 @@ const AdminProfile = () => {
 
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
-          <h1 className="text-lg font-serif font-extrabold text-white">Configure Shop Profile</h1>
+          <h1 className="text-lg font-serif font-extrabold text-text-primary">Configure Shop Profile</h1>
           <span className="text-xs text-muted font-bold font-mono">ID: {shopId?.substring(0, 8) ?? '—'}</span>
         </header>
 
@@ -261,7 +261,7 @@ const AdminProfile = () => {
               
               {/* Section 1: Public info */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 md:p-8 space-y-5 shadow-md">
-                <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+                <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                   <Store className="w-4.5 h-4.5 text-accent" />
                   Shop Information
                 </h3>
@@ -322,7 +322,7 @@ const AdminProfile = () => {
 
               {/* Section 2: Requirements & Rates */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 md:p-8 space-y-5 shadow-md">
-                <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+                <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                   <Sliders className="w-4.5 h-4.5 text-accent" />
                   Rates & Restrictions
                 </h3>
@@ -394,7 +394,7 @@ const AdminProfile = () => {
                         className={`flex items-center gap-2 px-3.5 py-2 border rounded-xl cursor-pointer text-xs font-semibold select-none transition-colors ${
                           formats[key]
                             ? 'bg-accent/15 border-accent text-accent'
-                            : 'bg-surface-dark border-border text-muted hover:text-white'
+                            : 'bg-surface-dark border-border text-muted hover:text-text-primary'
                         }`}
                       >
                         <input
@@ -424,7 +424,7 @@ const AdminProfile = () => {
             {/* Right Column: Counter QR Code Panel */}
             <div className="lg:col-span-4 space-y-6">
               <div className="bg-surface-ink border border-border rounded-3xl p-6 text-center space-y-5 shadow-md">
-                <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-3 flex items-center justify-center gap-2">
+                <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-3 flex items-center justify-center gap-2">
                   <QrCode className="w-4.5 h-4.5 text-accent" />
                   Shop Counter QR
                 </h3>
@@ -453,12 +453,12 @@ const AdminProfile = () => {
                 <div className="space-y-3.5 text-left">
                   <div className="space-y-1">
                     <span className="text-[10px] text-muted font-bold uppercase tracking-wider block">Customer Scan URL</span>
-                    <div className="flex items-center gap-1.5 bg-surface-dark border border-border rounded-xl p-2.5 font-mono text-[10px] text-white">
+                    <div className="flex items-center gap-1.5 bg-surface-dark border border-border rounded-xl p-2.5 font-mono text-[10px] text-text-primary">
                       <span className="truncate flex-1">{shopUrl || 'Generating link...'}</span>
                       <button
                         type="button"
                         onClick={handleCopyLink}
-                        className="text-accent hover:text-white transition-colors p-1 rounded hover:bg-surface-ink border border-transparent hover:border-border"
+                        className="text-accent hover:text-text-primary transition-colors p-1 rounded hover:bg-surface-ink border border-transparent hover:border-border"
                         title="Copy link"
                       >
                         {copied ? <CheckCircle className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
@@ -470,7 +470,7 @@ const AdminProfile = () => {
                     <button
                       type="button"
                       onClick={handleDownloadQR}
-                      className="w-full py-2.5 bg-surface-dark hover:bg-surface-dark/70 border border-border hover:border-accent/40 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
+                      className="w-full py-2.5 bg-surface-dark hover:bg-surface-dark/70 border border-border hover:border-accent/40 text-text-primary font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
                     >
                       <Download className="w-4 h-4 text-accent" />
                       Download QR Code Image (.png)
@@ -479,7 +479,7 @@ const AdminProfile = () => {
                     <button
                       type="button"
                       onClick={handlePrintQR}
-                      className="w-full py-2.5 bg-surface-dark hover:bg-surface-dark/70 border border-border hover:border-accent/40 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
+                      className="w-full py-2.5 bg-surface-dark hover:bg-surface-dark/70 border border-border hover:border-accent/40 text-text-primary font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors"
                     >
                       <Printer className="w-4 h-4 text-accent" />
                       Print Counter Poster

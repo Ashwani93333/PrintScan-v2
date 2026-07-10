@@ -123,7 +123,7 @@ const UploadPage = () => {
       <div className="min-h-screen bg-background flex flex-col justify-between">
         <Navbar />
         <main className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
-          <h2 className="text-2xl font-serif font-bold text-white">Shop Not Found</h2>
+          <h2 className="text-2xl font-serif font-bold text-text-primary">Shop Not Found</h2>
           <Link to="/shops" className="px-5 py-2.5 rounded-xl bg-accent text-background font-semibold text-sm hover:bg-accent-hover transition-colors">
             Back to Directory
           </Link>
@@ -270,7 +270,7 @@ const UploadPage = () => {
           <div className="text-left">
             <Link 
               to="/" 
-              className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-text-primary transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Back to Home
@@ -284,7 +284,7 @@ const UploadPage = () => {
                 {/* Header Details with dynamic Wifi/Connection badge */}
                 <div className="flex items-center justify-between border-b border-border/40 pb-4">
                   <div className="space-y-1">
-                    <h1 className="text-2xl font-sans font-extrabold text-white leading-tight">
+                    <h1 className="text-2xl font-sans font-extrabold text-text-primary leading-tight">
                       Upload Files
                     </h1>
                     <p className="text-xs text-muted">
@@ -358,13 +358,13 @@ const UploadPage = () => {
                                       <FileText className="w-5 h-5 text-blue-400" />
                                     )}
                                   </div>
-                                  <div className="absolute -bottom-1 -right-1 bg-[#2DB87A] text-white rounded-full p-0.5 border border-surface-ink">
+                                  <div className="absolute -bottom-1 -right-1 bg-[#2DB87A] text-text-primary rounded-full p-0.5 border border-surface-ink">
                                     <Check className="w-2.5 h-2.5 stroke-[3px]" />
                                   </div>
                                 </div>
                                 
                                 <div className="min-w-0 text-left">
-                                  <p className="text-xs font-bold text-white truncate max-w-[180px] sm:max-w-[240px]">
+                                  <p className="text-xs font-bold text-text-primary truncate max-w-[180px] sm:max-w-[240px]">
                                     {fileObj.name}
                                   </p>
                                   <div className="flex flex-wrap items-center gap-2 text-[10px] text-muted">
@@ -385,7 +385,7 @@ const UploadPage = () => {
                                     className={`px-3 py-1 rounded-md text-[10px] font-extrabold uppercase transition-all select-none ${
                                       !fileObj.colorPrint 
                                         ? 'bg-white text-black shadow-sm' 
-                                        : 'text-muted hover:text-white'
+                                        : 'text-muted hover:text-text-primary'
                                     }`}
                                   >
                                     B&W
@@ -396,7 +396,7 @@ const UploadPage = () => {
                                     className={`px-3 py-1 rounded-md text-[10px] font-extrabold uppercase transition-all select-none ${
                                       fileObj.colorPrint 
                                         ? 'bg-white text-black shadow-sm' 
-                                        : 'text-muted hover:text-white'
+                                        : 'text-muted hover:text-text-primary'
                                     }`}
                                   >
                                     Color
@@ -426,17 +426,17 @@ const UploadPage = () => {
                                   <button
                                     type="button"
                                     onClick={() => updateFileOption(fileObj.id, 'copies', Math.max(1, fileObj.copies - 1))}
-                                    className="px-2 py-0.5 text-muted hover:text-white font-extrabold text-sm"
+                                    className="px-2 py-0.5 text-muted hover:text-text-primary font-extrabold text-sm"
                                   >
                                     -
                                   </button>
-                                  <span className="text-[11px] font-bold text-white font-mono w-4 text-center">
+                                  <span className="text-[11px] font-bold text-text-primary font-mono w-4 text-center">
                                     {fileObj.copies}
                                   </span>
                                   <button
                                     type="button"
                                     onClick={() => updateFileOption(fileObj.id, 'copies', fileObj.copies + 1)}
-                                    className="px-2 py-0.5 text-muted hover:text-white font-extrabold text-sm"
+                                    className="px-2 py-0.5 text-muted hover:text-text-primary font-extrabold text-sm"
                                   >
                                     +
                                   </button>
@@ -478,7 +478,7 @@ const UploadPage = () => {
                       placeholder="e.g. Staple corner, landscape layout, double-sided details..."
                       value={specialInstructions}
                       onChange={(e) => setSpecialInstructions(e.target.value)}
-                      className="w-full bg-surface-dark border border-border focus:border-accent rounded-xl p-3 text-xs text-white placeholder-muted focus:outline-none transition-colors duration-150 resize-none"
+                      className="w-full bg-surface-dark border border-border focus:border-accent rounded-xl p-3 text-xs text-text-primary placeholder-muted focus:outline-none transition-colors duration-150 resize-none"
                     />
                   </div>
                 )}
@@ -532,7 +532,7 @@ const UploadPage = () => {
                       </span>
                     </div>
                     
-                    <h2 className="text-xl font-serif font-extrabold text-white leading-tight">
+                    <h2 className="text-xl font-serif font-extrabold text-text-primary leading-tight">
                       {shop.name}
                     </h2>
                     
@@ -547,7 +547,7 @@ const UploadPage = () => {
                       <MapPin className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
                       <div className="space-y-0.5 min-w-0">
                         <span className="text-[10px] text-muted font-bold uppercase tracking-wider block">Address</span>
-                        <p className="text-white font-medium leading-relaxed break-words">{shop.address}</p>
+                        <p className="text-text-primary font-medium leading-relaxed break-words">{shop.address}</p>
                       </div>
                     </div>
 
@@ -556,7 +556,7 @@ const UploadPage = () => {
                         <Phone className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
                         <div className="space-y-0.5 min-w-0">
                           <span className="text-[10px] text-muted font-bold uppercase tracking-wider block">Phone</span>
-                          <p className="text-white font-medium font-mono truncate">{shop.phone}</p>
+                          <p className="text-text-primary font-medium font-mono truncate">{shop.phone}</p>
                         </div>
                       </div>
 
@@ -564,7 +564,7 @@ const UploadPage = () => {
                         <Mail className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
                         <div className="space-y-0.5 min-w-0">
                           <span className="text-[10px] text-muted font-bold uppercase tracking-wider block">Email</span>
-                          <p className="text-white font-medium truncate">{shop.email}</p>
+                          <p className="text-text-primary font-medium truncate">{shop.email}</p>
                         </div>
                       </div>
                     </div>
@@ -573,7 +573,7 @@ const UploadPage = () => {
 
                 {/* Shop Specifications Card */}
                 <div className="bg-surface-ink border border-border rounded-3xl p-6 text-left space-y-5 shadow-xl animate-fade-in stagger-1">
-                  <h3 className="text-sm font-serif font-extrabold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+                  <h3 className="text-sm font-serif font-extrabold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                     <FileText className="w-4 h-4 text-accent" />
                     Shop Specifications
                   </h3>
@@ -584,7 +584,7 @@ const UploadPage = () => {
                       <span className="text-muted font-semibold block uppercase text-[10px]">Accepted Formats:</span>
                       <div className="flex flex-wrap gap-1.5">
                         {shop.requirements.acceptedFormats.map(fmt => (
-                          <span key={fmt} className="px-2.5 py-1 rounded bg-surface-dark text-[10px] font-bold text-white border border-border">
+                          <span key={fmt} className="px-2.5 py-1 rounded bg-surface-dark text-[10px] font-bold text-text-primary border border-border">
                             {fmt}
                           </span>
                         ))}
@@ -594,7 +594,7 @@ const UploadPage = () => {
                     {/* Page BW Pricing */}
                     <div className="flex justify-between items-center py-2 border-b border-border/40">
                       <span className="text-muted font-medium">B&W Rate (per page):</span>
-                      <span className="font-mono text-white font-bold text-sm">₹{shop.requirements.pricePerPageBW.toFixed(2)}</span>
+                      <span className="font-mono text-text-primary font-bold text-sm">₹{shop.requirements.pricePerPageBW.toFixed(2)}</span>
                     </div>
 
                     {/* Page Color Pricing */}
@@ -606,13 +606,13 @@ const UploadPage = () => {
                     {/* File constraints */}
                     <div className="flex justify-between items-center py-2 border-b border-border/40">
                       <span className="text-muted font-medium">Max File Size:</span>
-                      <span className="font-mono text-white font-semibold">{shop.requirements.maxFileSizeMb} MB</span>
+                      <span className="font-mono text-text-primary font-semibold">{shop.requirements.maxFileSizeMb} MB</span>
                     </div>
 
                     {/* Max files constraint */}
                     <div className="flex justify-between items-center py-2 border-b border-border/40">
                       <span className="text-muted font-medium">Max Files Per Job:</span>
-                      <span className="font-mono text-white font-semibold">{shop.requirements.maxFilesPerJob} Files</span>
+                      <span className="font-mono text-text-primary font-semibold">{shop.requirements.maxFilesPerJob} Files</span>
                     </div>
                   </div>
 
@@ -632,15 +632,10 @@ const UploadPage = () => {
                 </div>
               </div>
 
-              {/* Meme Photo attached */}
-              <div className="flex justify-center my-2">
-                <img src="/meme.jpg" alt="Success Meme" className="rounded-xl shadow-md border border-border max-h-40 object-contain w-full" />
-              </div>
-
               <div className="space-y-2">
-                <h1 className="text-2xl font-serif font-extrabold text-white">Job Submitted Successfully!</h1>
+                <h1 className="text-2xl font-serif font-extrabold text-text-primary">Job Submitted Successfully!</h1>
                 <p className="text-xs text-muted">
-                  Your files have been routed into the print queue of <span className="text-white font-semibold">{shop.name}</span>.
+                  Your files have been routed into the print queue of <span className="text-text-primary font-semibold">{shop.name}</span>.
                 </p>
               </div>
 
@@ -668,6 +663,11 @@ const UploadPage = () => {
                 </p>
               </div>
 
+               {/* Meme Photo attached */}
+              <div className="flex justify-center my-2">
+                <img src="/meme.jpg" alt="Success Meme" className="rounded-xl shadow-md border border-border max-h-40 object-contain w-full" />
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-sm mx-auto pt-2">
                 <Link
                   to={`/track/${successData.token}`}
@@ -678,7 +678,7 @@ const UploadPage = () => {
                 </Link>
                 <Link
                   to="/"
-                  className="flex-1 py-3 text-xs font-bold uppercase tracking-wider bg-surface-dark border border-border text-white hover:bg-primary/20 rounded-xl transition-colors"
+                  className="flex-1 py-3 text-xs font-bold uppercase tracking-wider bg-surface-dark border border-border text-text-primary hover:bg-primary/20 rounded-xl transition-colors"
                 >
                   Back to Home
                 </Link>
@@ -692,7 +692,7 @@ const UploadPage = () => {
       <footer className="border-t border-border bg-background py-6 mt-12 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 text-center text-xs text-muted flex flex-col sm:flex-row justify-between items-center gap-4">
         <p>&copy; {new Date().getFullYear()} PrintEase SaaS platform. All rights reserved.</p>
         <div className="flex gap-4 font-semibold">
-          <Link to="/" className="hover:text-white">Home</Link>
+          <Link to="/" className="hover:text-text-primary">Home</Link>
         </div>
       </footer>
     </div>

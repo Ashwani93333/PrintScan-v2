@@ -30,10 +30,10 @@ const Toast = ({ message, type = 'success', onClose, duration = 3000 }) => {
   return (
     <div className={`flex items-center gap-3 w-full max-w-sm p-4 bg-surface-dark border ${borderColors[type]} rounded-xl shadow-2xl animate-scale-in`}>
       <div>{icons[type]}</div>
-      <div className="flex-1 text-sm font-medium text-white">{message}</div>
+      <div className="flex-1 text-sm font-medium text-text-primary">{message}</div>
       <button 
         onClick={onClose}
-        className="text-muted hover:text-white transition-colors duration-150"
+        className="text-muted hover:text-text-primary transition-colors duration-150"
       >
         <X className="w-4 h-4" />
       </button>

@@ -80,7 +80,7 @@ const SuperAnalytics = () => {
       <div className="flex-1 flex flex-col text-left">
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
-          <h1 className="text-lg font-serif font-extrabold text-white">Platform Performance Analytics</h1>
+          <h1 className="text-lg font-serif font-extrabold text-text-primary">Platform Performance Analytics</h1>
           <span className="text-xs text-muted font-bold font-mono">Period: {activeFrom} to {activeTo}</span>
         </header>
 
@@ -133,7 +133,7 @@ const SuperAnalytics = () => {
             {/* Total Shops */}
             <div className="bg-surface-ink border border-border p-4 rounded-xl space-y-1">
               <span className="text-[9px] text-muted font-bold uppercase tracking-wider block">Total Shops</span>
-              <span className="text-xl font-bold text-white block">{stats.totalShops}</span>
+              <span className="text-xl font-bold text-text-primary block">{stats.totalShops}</span>
               <span className="text-[8px] text-muted flex items-center gap-0.5"><Store className="w-2.5 h-2.5" /> platform vendors</span>
             </div>
 
@@ -147,7 +147,7 @@ const SuperAnalytics = () => {
             {/* Total Jobs */}
             <div className="bg-surface-ink border border-border p-4 rounded-xl space-y-1">
               <span className="text-[9px] text-muted font-bold uppercase tracking-wider block">Total Jobs</span>
-              <span className="text-xl font-bold text-white block">{stats.totalJobs}</span>
+              <span className="text-xl font-bold text-text-primary block">{stats.totalJobs}</span>
               <span className="text-[8px] text-muted flex items-center gap-0.5"><FileText className="w-2.5 h-2.5" /> in period</span>
             </div>
 
@@ -181,7 +181,7 @@ const SuperAnalytics = () => {
             
             {/* Left 8/12 Recharts Vector Graph */}
             <div className="lg:col-span-8 bg-surface-ink border border-border rounded-3xl p-6 shadow-xl space-y-4 animate-fade-in stagger-1 text-left">
-              <h3 className="text-sm font-serif font-extrabold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+              <h3 className="text-sm font-serif font-extrabold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-accent" />
                 Continuous Daily Print Job Volume
               </h3>
@@ -244,7 +244,7 @@ const SuperAnalytics = () => {
 
             {/* Right 4/12 Top Shops rankings with completion rate progress bars */}
             <div className="lg:col-span-4 bg-surface-ink border border-border rounded-3xl p-6 shadow-xl space-y-4 animate-fade-in stagger-2 text-left">
-              <h3 className="text-sm font-serif font-extrabold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+              <h3 className="text-sm font-serif font-extrabold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                 <Store className="w-4 h-4 text-accent" />
                 Top Performing Shops
               </h3>
@@ -258,7 +258,7 @@ const SuperAnalytics = () => {
                   {stats.shopCompletionRates.map((item, idx) => (
                     <div key={idx} className="space-y-1.5">
                       <div className="flex justify-between items-center text-xs font-semibold">
-                        <span className="text-white truncate max-w-[150px]">{item.shopName}</span>
+                        <span className="text-text-primary truncate max-w-[150px]">{item.shopName}</span>
                         {item.jobCount !== undefined && <span className="text-muted font-mono">{item.jobCount} jobs</span>}
                       </div>
                       

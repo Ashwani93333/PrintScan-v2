@@ -90,7 +90,7 @@ const AdminDashboard = () => {
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-serif font-extrabold text-white">Dashboard Overview</h1>
+            <h1 className="text-lg font-serif font-extrabold text-text-primary">Dashboard Overview</h1>
             <span className="px-2 py-0.5 rounded bg-surface-dark border border-border text-[10px] text-accent font-semibold">
               {shop?.name || 'My Shop'}
             </span>
@@ -112,7 +112,7 @@ const AdminDashboard = () => {
             <div className="bg-surface-ink border border-border p-5 rounded-2xl flex items-center justify-between shadow-md hover:border-border/80 transition-all">
               <div className="space-y-1">
                 <span className="text-[10px] text-muted font-bold uppercase tracking-wider block">Total Jobs</span>
-                <span className="text-2xl font-bold text-white block">{totalJobs}</span>
+                <span className="text-2xl font-bold text-text-primary block">{totalJobs}</span>
               </div>
               <div className="p-3 bg-surface-dark border border-border rounded-xl text-blue-400">
                 <FileText className="w-5 h-5" />
@@ -158,7 +158,7 @@ const AdminDashboard = () => {
           <div className="bg-surface-ink border border-border rounded-3xl p-6 shadow-xl space-y-6 animate-fade-up">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <div className="space-y-1">
-                <h2 className="text-sm font-serif font-extrabold text-white flex items-center gap-2">
+                <h2 className="text-sm font-serif font-extrabold text-text-primary flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-accent animate-pulse-subtle" />
                   Shop Analytics & Revenue Insights
                 </h2>
@@ -187,7 +187,7 @@ const AdminDashboard = () => {
                   </div>
                   <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
                     <span className="text-xs text-muted">Pending Estimates</span>
-                    <span className="font-mono text-sm text-white font-extrabold">—</span>
+                    <span className="font-mono text-sm text-text-primary font-extrabold">—</span>
                   </div>
                   <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
                     <span className="text-xs text-muted">Awaiting Collection</span>
@@ -229,7 +229,7 @@ const AdminDashboard = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center border-b border-border/20 pb-1.5">
                     <span className="text-xs text-muted">Recent Activity (Last {recentJobs.length})</span>
-                    <span className="font-mono text-sm text-white font-bold">Active</span>
+                    <span className="font-mono text-sm text-text-primary font-bold">Active</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 pt-1 text-[10px]">
                     <div className="p-2 bg-surface-ink/60 border border-border/30 rounded-lg text-left">
@@ -257,7 +257,7 @@ const AdminDashboard = () => {
             {/* Left 8/12 Recent Jobs Queue */}
             <div className="lg:col-span-8 bg-surface-ink border border-border rounded-3xl p-6 shadow-xl space-y-4 animate-fade-in stagger-1">
               <div className="flex justify-between items-center border-b border-border/40 pb-3">
-                <h3 className="text-sm font-serif font-extrabold text-white flex items-center gap-2">
+                <h3 className="text-sm font-serif font-extrabold text-text-primary flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-accent" />
                   Recent Document Uploads
                 </h3>
@@ -298,14 +298,14 @@ const AdminDashboard = () => {
                       {recentJobs.map((job) => (
                         <tr key={job.id} className="hover:bg-surface-dark/40 transition-colors">
                           <td className="py-3 px-3 font-mono font-bold text-accent">{job.accessToken}</td>
-                          <td className="py-3 px-3 text-white font-medium">{job.customerName}</td>
+                          <td className="py-3 px-3 text-text-primary font-medium">{job.customerName}</td>
                           <td className="py-3 px-3">
                             <StatusBadge status={job.status} />
                           </td>
                           <td className="py-3 px-3 text-muted">
                             {job.totalPages !== null && job.totalPages !== undefined ? `${job.totalPages} pgs` : '—'}
                           </td>
-                          <td className="py-3 px-3 font-mono text-white font-semibold">
+                          <td className="py-3 px-3 font-mono text-text-primary font-semibold">
                             {job.estimatedCost !== null && job.estimatedCost !== undefined 
                               ? `₹${job.estimatedCost.toFixed(2)}` 
                               : '—'}
@@ -314,7 +314,7 @@ const AdminDashboard = () => {
                           <td className="py-3 px-3 text-right">
                             <button
                               onClick={() => navigate(`/admin/jobs/${job.id}`)}
-                              className="p-1.5 bg-surface-dark hover:bg-surface-dark/70 border border-border hover:border-accent/40 text-muted hover:text-white rounded-lg transition-all"
+                              className="p-1.5 bg-surface-dark hover:bg-surface-dark/70 border border-border hover:border-accent/40 text-muted hover:text-text-primary rounded-lg transition-all"
                               title="View Details"
                             >
                               <Eye className="w-4 h-4" />
@@ -333,7 +333,7 @@ const AdminDashboard = () => {
               
               {/* Quick Actions Panel */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 text-left space-y-4 shadow-xl">
-                <h3 className="text-sm font-serif font-extrabold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+                <h3 className="text-sm font-serif font-extrabold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-accent" />
                   Quick Controls
                 </h3>
@@ -341,7 +341,7 @@ const AdminDashboard = () => {
                 <div className="space-y-2.5">
                   <Link
                     to="/admin/profile"
-                    className="flex items-center gap-3 p-3 bg-surface-dark/60 border border-border hover:border-accent/40 rounded-xl transition-all w-full text-xs font-semibold text-white group"
+                    className="flex items-center gap-3 p-3 bg-surface-dark/60 border border-border hover:border-accent/40 rounded-xl transition-all w-full text-xs font-semibold text-text-primary group"
                   >
                     <div className="p-2 bg-surface-ink border border-border text-accent rounded-lg group-hover:bg-accent/15 transition-all">
                       <Store className="w-4 h-4" />
@@ -354,7 +354,7 @@ const AdminDashboard = () => {
 
                   <Link
                     to="/admin/jobs"
-                    className="flex items-center gap-3 p-3 bg-surface-dark/60 border border-border hover:border-accent/40 rounded-xl transition-all w-full text-xs font-semibold text-white group"
+                    className="flex items-center gap-3 p-3 bg-surface-dark/60 border border-border hover:border-accent/40 rounded-xl transition-all w-full text-xs font-semibold text-text-primary group"
                   >
                     <div className="p-2 bg-surface-ink border border-border text-accent rounded-lg group-hover:bg-accent/15 transition-all">
                       <FileCheck2 className="w-4 h-4" />
@@ -369,11 +369,11 @@ const AdminDashboard = () => {
 
               {/* Dynamic shop details stats */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 text-left space-y-4 shadow-xl">
-                <h3 className="text-xs font-serif font-extrabold text-white tracking-widest uppercase block border-b border-border/40 pb-3">Active Pricing Parameters</h3>
+                <h3 className="text-xs font-serif font-extrabold text-text-primary tracking-widest uppercase block border-b border-border/40 pb-3">Active Pricing Parameters</h3>
                 <div className="space-y-3.5 text-xs">
                   <div className="flex justify-between items-center py-1">
                     <span className="text-muted">B&W Rate:</span>
-                    <span className="font-mono text-white font-bold">₹{shop?.requirements.pricePerPageBW.toFixed(2)}</span>
+                    <span className="font-mono text-text-primary font-bold">₹{shop?.requirements.pricePerPageBW.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center py-1">
                     <span className="text-muted">Color Rate:</span>
@@ -388,7 +388,7 @@ const AdminDashboard = () => {
 
               {/* Quick QR Code Card */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 text-center space-y-4 shadow-xl">
-                <h3 className="text-sm font-serif font-extrabold text-white border-b border-border/40 pb-3 flex items-center justify-center gap-2">
+                <h3 className="text-sm font-serif font-extrabold text-text-primary border-b border-border/40 pb-3 flex items-center justify-center gap-2">
                   <QrCode className="w-4 h-4 text-accent" />
                   Shop Counter QR
                 </h3>

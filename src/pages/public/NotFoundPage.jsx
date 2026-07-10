@@ -16,7 +16,7 @@ const NotFoundPage = () => {
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-3xl font-serif font-extrabold text-white">Something went wrong</h1>
+            <h1 className="text-3xl font-serif font-extrabold text-text-primary">Something went wrong</h1>
             <p className="text-sm text-muted leading-relaxed">
               The page you are looking for does not exist or has been moved. Please check the URL or return to the homepage.
             </p>

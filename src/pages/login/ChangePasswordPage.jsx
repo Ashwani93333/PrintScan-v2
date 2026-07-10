@@ -109,7 +109,7 @@ const ChangePasswordPage = () => {
       <div className="flex-1 flex flex-col text-left">
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
-          <h2 className="text-lg font-serif font-extrabold text-white">Change Account Password</h2>
+          <h2 className="text-lg font-serif font-extrabold text-text-primary">Change Account Password</h2>
           <span className="text-xs text-muted">Secure Terminal</span>
         </header>
 
@@ -117,7 +117,7 @@ const ChangePasswordPage = () => {
         <main className="flex-1 p-6 md:p-8 flex items-center justify-center">
           <div className="w-full max-w-md bg-surface-ink border border-border rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl animate-scale-in">
             <div className="space-y-1">
-              <h3 className="text-lg font-serif font-bold text-white flex items-center gap-2">
+              <h3 className="text-lg font-serif font-bold text-text-primary flex items-center gap-2">
                 <KeyRound className="w-5 h-5 text-accent" />
                 Change Password
               </h3>
@@ -156,7 +156,7 @@ const ChangePasswordPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowCurrent(!showCurrent)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text-primary transition-colors"
                   >
                     {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -178,7 +178,7 @@ const ChangePasswordPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowNew(!showNew)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text-primary transition-colors"
                   >
                     {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -217,7 +217,7 @@ const ChangePasswordPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text-primary transition-colors"
                   >
                     {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>

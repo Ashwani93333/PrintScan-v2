@@ -117,11 +117,11 @@ const SuperCreateShop = () => {
           <div className="flex items-center gap-4">
             <Link 
               to="/superadmin/shops" 
-              className="p-1.5 hover:bg-surface-dark border border-transparent hover:border-border rounded-lg text-muted hover:text-white transition-all"
+              className="p-1.5 hover:bg-surface-dark border border-transparent hover:border-border rounded-lg text-muted hover:text-text-primary transition-all"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
-            <h1 className="text-lg font-serif font-extrabold text-white">Manual Provision Shop</h1>
+            <h1 className="text-lg font-serif font-extrabold text-text-primary">Manual Provision Shop</h1>
           </div>
           <span className="text-xs text-muted">Platform Provisioning</span>
         </header>
@@ -132,16 +132,16 @@ const SuperCreateShop = () => {
             
             {/* Breadcrumbs */}
             <nav className="flex items-center gap-1.5 text-xs text-muted">
-              <Link to="/superadmin/dashboard" className="hover:text-white">Admin</Link>
+              <Link to="/superadmin/dashboard" className="hover:text-text-primary">Admin</Link>
               <ChevronRight className="w-3.5 h-3.5" />
-              <Link to="/superadmin/shops" className="hover:text-white">Shops</Link>
+              <Link to="/superadmin/shops" className="hover:text-text-primary">Shops</Link>
               <ChevronRight className="w-3.5 h-3.5" />
-              <span className="text-white font-semibold">Provision Shop</span>
+              <span className="text-text-primary font-semibold">Provision Shop</span>
             </nav>
 
             {/* Section 1: Shop details */}
             <div className="bg-surface-ink border border-border rounded-3xl p-6 md:p-8 space-y-5 shadow-md">
-              <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+              <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                 <Building2 className="w-4.5 h-4.5 text-accent" />
                 1. Shop Specifications
               </h3>
@@ -221,7 +221,7 @@ const SuperCreateShop = () => {
 
             {/* Section 2: Owner/Admin account details */}
             <div className="bg-surface-ink border border-border rounded-3xl p-6 md:p-8 space-y-5 shadow-md">
-              <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+              <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                 <User className="w-4.5 h-4.5 text-accent" />
                 2. Admin Credentials
               </h3>
@@ -252,7 +252,7 @@ const SuperCreateShop = () => {
               <div className="p-3 bg-surface-dark/40 border border-border/60 rounded-xl text-[10px] text-muted flex gap-2 items-start leading-relaxed">
                 <ShieldCheck className="w-4.5 h-4.5 text-success flex-shrink-0" />
                 <span>
-                  Admin Created shops are automatically approved and activated immediately. Standard default password for shop administrators is set to <span className="text-white font-mono font-bold">Password123!</span>.
+                  Admin Created shops are automatically approved and activated immediately. Standard default password for shop administrators is set to <span className="text-text-primary font-mono font-bold">Password123!</span>.
                 </span>
               </div>
             </div>

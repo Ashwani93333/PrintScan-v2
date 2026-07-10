@@ -72,13 +72,13 @@ const Sidebar = ({ isSuper = false }) => {
       <div className="flex md:hidden items-center justify-between px-4 h-14 bg-surface-dark border-b border-border w-full sticky top-0 z-30">
         <div className="flex items-center gap-2">
           <img src="/printease-logo.jpeg" alt="PrintEase Logo" className="w-6 h-6 rounded-md object-cover" />
-          <span className="font-serif font-extrabold text-sm text-white">
+          <span className="font-serif font-extrabold text-sm text-text-primary">
             {isSuper ? 'PrintEase Super' : 'PrintEase Admin'}
           </span>
         </div>
         <button
           onClick={() => setMobileVisible(!mobileVisible)}
-          className="p-2 border border-border rounded-lg text-muted hover:text-white"
+          className="p-2 border border-border rounded-lg text-muted hover:text-text-primary"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -101,7 +101,7 @@ const Sidebar = ({ isSuper = false }) => {
         {/* Toggle Collapse Button for Desktop */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden md:flex absolute top-7 -right-3 p-1 rounded-full bg-border text-muted hover:text-white border border-border transition-all duration-150"
+          className="hidden md:flex absolute top-7 -right-3 p-1 rounded-full bg-border text-muted hover:text-text-primary border border-border transition-all duration-150"
         >
           {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
         </button>
@@ -114,7 +114,7 @@ const Sidebar = ({ isSuper = false }) => {
             </div>
             {!collapsed && (
               <div className="min-w-0">
-                <h3 className="font-serif font-extrabold text-sm text-white truncate">
+                <h3 className="font-serif font-extrabold text-sm text-text-primary truncate">
                   {isSuper ? 'Super Admin' : user?.name || 'Shop Admin'}
                 </h3>
                 <p className="text-[10px] text-muted truncate">
@@ -137,11 +137,11 @@ const Sidebar = ({ isSuper = false }) => {
                 className={`flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 group relative ${
                   active 
                     ? 'bg-accent/10 border-l-2 border-accent text-accent font-semibold' 
-                    : 'text-muted hover:text-white hover:bg-surface-dark border-l-2 border-transparent'
+                    : 'text-muted hover:text-text-primary hover:bg-surface-dark border-l-2 border-transparent'
                 } ${collapsed ? 'justify-center' : ''}`}
                 title={collapsed ? item.name : ''}
               >
-                <span className={`transition-transform duration-200 group-hover:scale-105 ${active ? 'text-accent' : 'text-muted group-hover:text-white'}`}>
+                <span className={`transition-transform duration-200 group-hover:scale-105 ${active ? 'text-accent' : 'text-muted group-hover:text-text-primary'}`}>
                   {item.icon}
                 </span>
                 

@@ -163,7 +163,7 @@ Thank you!`;
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center py-3.5 px-6 rounded-xl bg-[#16b38a] hover:bg-[#139c78] text-white font-bold transition-all shadow-lg shadow-[#16b38a]/30 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center py-3.5 px-6 rounded-xl bg-[#16b38a] hover:bg-[#139c78] text-text-primary font-bold transition-all shadow-lg shadow-[#16b38a]/30 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>

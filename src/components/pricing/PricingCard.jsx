@@ -5,12 +5,12 @@ const PricingCard = ({ title, price, period, features, isPopular, isBestValue, o
   return (
     <div className={`bg-white rounded-[2rem] p-8 flex flex-col items-center shadow-xl transition-transform hover:scale-105 duration-300 ${isPopular ? 'border-[3px] border-[#16b38a] relative md:-translate-y-4 h-full' : 'border border-gray-100 relative h-full'}`}>
       {isPopular && (
-        <div className="absolute -top-4 bg-[#16b38a] text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
+        <div className="absolute -top-4 bg-[#16b38a] text-text-primary text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
           Most Popular
         </div>
       )}
       {isBestValue && (
-        <div className="absolute -top-4 bg-slate-900 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
+        <div className="absolute -top-4 bg-slate-900 text-text-primary text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
           Best Value
         </div>
       )}
@@ -41,8 +41,8 @@ const PricingCard = ({ title, price, period, features, isPopular, isBestValue, o
         onClick={() => onSelectPlan(`${title} – ₹${price}`)}
         className={`w-full py-3.5 px-6 rounded-xl font-bold transition-colors mt-auto ${
           isPopular 
-            ? 'bg-[#16b38a] hover:bg-[#139c78] text-white shadow-lg shadow-[#16b38a]/30' 
-            : 'border-2 border-[#16b38a] text-[#16b38a] hover:bg-[#16b38a] hover:text-white'
+            ? 'bg-[#16b38a] hover:bg-[#139c78] text-text-primary shadow-lg shadow-[#16b38a]/30' 
+            : 'border-2 border-[#16b38a] text-[#16b38a] hover:bg-[#16b38a] hover:text-text-primary'
         }`}
       >
         Select Plan

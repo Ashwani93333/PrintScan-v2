@@ -87,7 +87,7 @@ const LandingPage = () => {
               <span>20+ shops | 1000+ prints daily | Shop revenue</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-extrabold text-white leading-[1.1] tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-extrabold text-text-primary leading-[1.1] tracking-tight">
               Your Documents.<br />
               <span className="text-accent text-glow-amber">Printed Instantly.</span>
             </h1>
@@ -98,7 +98,7 @@ const LandingPage = () => {
 
             {/* Quick Actions */}
             <div className="flex flex-col pt-4 w-full max-w-md">
-              <label className="text-sm text-white font-medium mb-2 block">
+              <label className="text-sm text-text-primary font-medium mb-2 block">
                 Enter shop slug to upload files directly...
               </label>
               {/* Upload to Shop Quick Input */}
@@ -108,7 +108,7 @@ const LandingPage = () => {
                   placeholder="e.g. campus-quick-print"
                   value={slugInput}
                   onChange={(e) => setSlugInput(e.target.value)}
-                  className="w-full pr-14 pl-5 py-4 text-base bg-surface-ink/80 backdrop-blur-sm border-2 border-border focus:border-accent focus:ring-4 focus:ring-accent/10 rounded-xl text-white placeholder:text-muted transition-all duration-200"
+                  className="w-full pr-14 pl-5 py-4 text-base bg-surface-ink/80 backdrop-blur-sm border-2 border-border focus:border-accent focus:ring-4 focus:ring-accent/10 rounded-xl text-text-primary placeholder:text-muted transition-all duration-200"
                   required
                 />
                 <button
@@ -160,7 +160,7 @@ const LandingPage = () => {
                       </div>
                     </div>
                   </div>
-                  <button className="px-4 py-2 bg-[#16b38a] text-white text-sm font-bold rounded-lg shadow-md shadow-[#16b38a]/20 hover:bg-[#139c78] transition-colors">
+                  <button className="px-4 py-2 bg-[#16b38a] text-text-primary text-sm font-bold rounded-lg shadow-md shadow-[#16b38a]/20 hover:bg-[#139c78] transition-colors">
                     Print
                   </button>
                 </div>
@@ -182,7 +182,7 @@ const LandingPage = () => {
                       </div>
                     </div>
                   </div>
-                  <button className="px-4 py-2 bg-[#16b38a] text-white text-sm font-bold rounded-lg shadow-md shadow-[#16b38a]/20 hover:bg-[#139c78] transition-colors">
+                  <button className="px-4 py-2 bg-[#16b38a] text-text-primary text-sm font-bold rounded-lg shadow-md shadow-[#16b38a]/20 hover:bg-[#139c78] transition-colors">
                     Print
                   </button>
                 </div>
@@ -210,7 +210,7 @@ const LandingPage = () => {
       <section className="bg-surface-ink border-y border-border py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <h2 className="text-3xl font-serif font-extrabold text-white">How It Works</h2>
+            <h2 className="text-3xl font-serif font-extrabold text-text-primary">How It Works</h2>
             <p className="text-sm text-muted">Three simple industrial-grade operational phases to get your papers physically ready.</p>
           </div>
 
@@ -222,7 +222,7 @@ const LandingPage = () => {
                 <div className="p-3 w-fit bg-background rounded-xl border border-border text-accent">
                   <Compass className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-serif font-bold text-white">Enter Shop Handle</h3>3
+                <h3 className="text-lg font-serif font-bold text-text-primary">Enter Shop Handle</h3>3
                 <p className="text-sm text-muted">
                   Know your print shop's unique handle? Enter it directly to jump straight into their upload portal.
                 </p>
@@ -236,7 +236,7 @@ const LandingPage = () => {
                 <div className="p-3 w-fit bg-background rounded-xl border border-border text-accent">
                   <UploadCloud className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-serif font-bold text-white">Upload Your Files</h3>
+                <h3 className="text-lg font-serif font-bold text-text-primary">Upload Your Files</h3>
                 <p className="text-sm text-muted">
                   Drop PDFs, JPGs, or DOCX files. Toggle double-sided layouts, B&W or Color options, and print copies.
                 </p>
@@ -250,7 +250,7 @@ const LandingPage = () => {
                 <div className="p-3 w-fit bg-background rounded-xl border border-border text-accent">
                   <Clock className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-serif font-bold text-white">Track & Collect</h3>
+                <h3 className="text-lg font-serif font-bold text-text-primary">Track & Collect</h3>
                 <p className="text-sm text-muted">
                   Receive a token number to track status. Collect from counter as soon as status indicates ready.
                 </p>
@@ -263,7 +263,7 @@ const LandingPage = () => {
       {/* Features Section */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <h2 className="text-3xl font-serif font-extrabold text-white">Features Built for Execution</h2>
+          <h2 className="text-3xl font-serif font-extrabold text-text-primary">Features Built for Execution</h2>
           <p className="text-sm text-muted">Equipped with custom indicators, live tracking queues, and fully automated estimations.</p>
         </div>
 
@@ -274,7 +274,7 @@ const LandingPage = () => {
               <Clock className="w-5 h-5" />
             </div>
             <div className="space-y-1 text-left">
-              <h4 className="text-sm font-serif font-bold text-white">Real-Time Tracking</h4>
+              <h4 className="text-sm font-serif font-bold text-text-primary">Real-Time Tracking</h4>
               <p className="text-xs text-muted">Live job queues let you see exactly where your paper is in the printer stepper.</p>
             </div>
           </div>
@@ -285,7 +285,7 @@ const LandingPage = () => {
               <Compass className="w-5 h-5" />
             </div>
             <div className="space-y-1 text-left">
-              <h4 className="text-sm font-serif font-bold text-white">QR Code Integrations</h4>
+              <h4 className="text-sm font-serif font-bold text-text-primary">QR Code Integrations</h4>
               <p className="text-xs text-muted">Walk up, scan, drag-drop from your smartphone, and sit back without creating any account.</p>
             </div>
           </div>
@@ -296,7 +296,7 @@ const LandingPage = () => {
               <FileCheck className="w-5 h-5" />
             </div>
             <div className="space-y-1 text-left">
-              <h4 className="text-sm font-serif font-bold text-white">Multi-Format Files</h4>
+              <h4 className="text-sm font-serif font-bold text-text-primary">Multi-Format Files</h4>
               <p className="text-xs text-muted">Full cloud validation for PDFs, JPGs, PNGs, and Microsoft Word DOCX formats.</p>
             </div>
           </div>
@@ -307,7 +307,7 @@ const LandingPage = () => {
               <Coins className="w-5 h-5" />
             </div>
             <div className="space-y-1 text-left">
-              <h4 className="text-sm font-serif font-bold text-white">Instant Cost Estimator</h4>
+              <h4 className="text-sm font-serif font-bold text-text-primary">Instant Cost Estimator</h4>
               <p className="text-xs text-muted">Real-time dynamic page-multiplier calculations derived from custom shop rates.</p>
             </div>
           </div>
@@ -318,7 +318,7 @@ const LandingPage = () => {
               <Mail className="w-5 h-5" />
             </div>
             <div className="space-y-1 text-left">
-              <h4 className="text-sm font-serif font-bold text-white">Email & Notifications</h4>
+              <h4 className="text-sm font-serif font-bold text-text-primary">Email & Notifications</h4>
               <p className="text-xs text-muted">Keep updated in full automatically without constantly refreshing the live tab.</p>
             </div>
           </div>
@@ -329,7 +329,7 @@ const LandingPage = () => {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div className="space-y-1 text-left">
-              <h4 className="text-sm font-serif font-bold text-white">Secure Storage</h4>
+              <h4 className="text-sm font-serif font-bold text-text-primary">Secure Storage</h4>
               <p className="text-xs text-muted">Fully encrypted file handling system. Printed documents are deleted on job collections.</p>
             </div>
           </div>
@@ -340,7 +340,7 @@ const LandingPage = () => {
       <section className="bg-surface-ink border-y border-border py-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <h2 className="text-3xl font-serif font-extrabold text-white">Recent Uploded Files</h2>
+            <h2 className="text-3xl font-serif font-extrabold text-text-primary">Recent Uploded Files</h2>
             {/* <p className="text-sm text-muted">Hover over the cards to see the tilt animation in action.</p> */}
           </div>
 
@@ -365,7 +365,7 @@ const LandingPage = () => {
                       {job.status}
                     </span>
                   </div>
-                  <h4 className="text-sm font-semibold text-white mb-2 truncate" title={job.name}>{job.name}</h4>
+                  <h4 className="text-sm font-semibold text-text-primary mb-2 truncate" title={job.name}>{job.name}</h4>
                 </div>
                 <div className="flex items-center gap-4 text-xs text-muted mt-auto pt-4 border-t border-border/50">
                   <span>{job.pages} Pages</span>
@@ -387,14 +387,14 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Owner text */}
             <div className="lg:col-span-6 space-y-6 text-left">
-              <h2 className="text-3xl sm:text-4xl font-serif font-extrabold text-white leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-serif font-extrabold text-text-primary leading-tight">
                 Grow Your Print Business with PrintEase
               </h2>
               <p className="text-sm sm:text-base text-muted leading-relaxed">
                 Connect with hundreds of students and local customers needing instant print jobs. Eliminate the friction of emails, USB drives, and manual cash handovers. Get a custom branded QR code for your shop counter!
               </p>
               
-              <ul className="space-y-3.5 text-sm text-white font-medium">
+              <ul className="space-y-3.5 text-sm text-text-primary font-medium">
                 <li className="flex items-center gap-3">
                   <span className="p-1 rounded-full bg-accent/20 text-accent"><ShieldCheck className="w-3.5 h-3.5" /></span>
                   Automated queues & customer status notifications
@@ -436,7 +436,7 @@ const LandingPage = () => {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="p-3 bg-surface-ink border border-border rounded-xl text-left">
                     <span className="text-[10px] text-muted block font-medium">Total Jobs</span>
-                    <span className="text-lg font-bold text-white block">142</span>
+                    <span className="text-lg font-bold text-text-primary block">142</span>
                   </div>
                   <div className="p-3 bg-surface-ink border border-border rounded-xl text-left">
                     <span className="text-[10px] text-muted block font-medium">Pending</span>
@@ -452,11 +452,11 @@ const LandingPage = () => {
                   <h4 className="text-xs font-mono text-accent uppercase tracking-widest font-bold">Realtime Job Queue</h4>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs py-1.5 border-b border-border/40">
-                      <span className="font-mono text-white font-semibold">Job #1</span>
+                      <span className="font-mono text-text-primary font-semibold">Job #1</span>
                       <span className="text-[10px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded-full font-bold">PENDING</span>
                     </div>
                     <div className="flex items-center justify-between text-xs py-1.5 border-b border-border/40">
-                      <span className="font-mono text-white font-semibold">Job #2</span>
+                      <span className="font-mono text-text-primary font-semibold">Job #2</span>
                       <span className="text-[10px] bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full font-bold">PROCESSING</span>
                     </div>
                   </div>
@@ -475,7 +475,7 @@ const LandingPage = () => {
             {/* Left - Logo */}
             <div className="flex items-center gap-2 w-full md:w-1/3 justify-center md:justify-start">
               <img src="/printease-logo.jpeg" alt="PrintEase Logo" className="w-8 h-8 rounded-md object-cover" />
-              <span className="text-base font-serif font-extrabold text-white tracking-tight">
+              <span className="text-base font-serif font-extrabold text-text-primary tracking-tight">
                 Print<span className="text-accent text-glow-amber">Ease</span>
               </span>
             </div>
@@ -493,13 +493,13 @@ const LandingPage = () => {
               <div className="relative">
                 <button 
                   onClick={() => setIsContactOpen(!isContactOpen)}
-                  className={`transition-colors duration-200 ${isContactOpen ? 'text-accent' : 'hover:text-white'}`}
+                  className={`transition-colors duration-200 ${isContactOpen ? 'text-accent' : 'hover:text-text-primary'}`}
                 >
                   Contact Support
                 </button>
                 {isContactOpen && (
                   <div className="absolute bottom-full mb-4 right-1/2 translate-x-1/2 md:translate-x-0 md:right-0 w-64 bg-surface-dark border border-border rounded-xl shadow-2xl p-4 animate-fade-in z-50 text-left">
-                    <h4 className="text-sm font-semibold text-white mb-3 border-b border-border pb-2">Support Details</h4>
+                    <h4 className="text-sm font-semibold text-text-primary mb-3 border-b border-border pb-2">Support Details</h4>
                     <div className="space-y-3 text-xs text-muted">
                       <a href="https://wa.me/7303028574" target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-accent transition-colors">
                         <MessageCircle className="w-4 h-4" />
@@ -517,7 +517,7 @@ const LandingPage = () => {
                   </div>
                 )}
               </div>
-              <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/privacy" className="hover:text-text-primary transition-colors">Privacy Policy</Link>
             </div>
 
           </div>

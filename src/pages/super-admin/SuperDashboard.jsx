@@ -119,7 +119,7 @@ const SuperDashboard = () => {
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-serif font-extrabold text-white">Super Admin Dashboard</h1>
+            <h1 className="text-lg font-serif font-extrabold text-text-primary">Super Admin Dashboard</h1>
             <span className="px-2 py-0.5 rounded bg-surface-dark border border-border text-[9px] text-accent font-bold uppercase tracking-wider flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-accent" />
               Platform Controller
@@ -142,7 +142,7 @@ const SuperDashboard = () => {
             <div className="bg-surface-ink border border-border p-4.5 rounded-2xl flex items-center justify-between shadow-md">
               <div className="space-y-1">
                 <span className="text-[10px] text-muted font-bold uppercase block">Total Shops</span>
-                <span className="text-xl font-bold text-white block">{totalShops}</span>
+                <span className="text-xl font-bold text-text-primary block">{totalShops}</span>
               </div>
               <div className="p-2.5 bg-surface-dark border border-border rounded-xl text-blue-400">
                 <Store className="w-4.5 h-4.5" />
@@ -175,7 +175,7 @@ const SuperDashboard = () => {
             <div className="bg-surface-ink border border-border p-4.5 rounded-2xl flex items-center justify-between shadow-md">
               <div className="space-y-1">
                 <span className="text-[10px] text-muted font-bold uppercase block">Total Jobs</span>
-                <span className="text-xl font-bold text-white block">{totalJobs}</span>
+                <span className="text-xl font-bold text-text-primary block">{totalJobs}</span>
               </div>
               <div className="p-2.5 bg-surface-dark border border-border rounded-xl text-blue-400">
                 <FileText className="w-4.5 h-4.5" />
@@ -186,7 +186,7 @@ const SuperDashboard = () => {
             <div className="bg-surface-ink border border-border p-4.5 rounded-2xl flex items-center justify-between shadow-md">
               <div className="space-y-1">
                 <span className="text-[10px] text-muted font-bold uppercase block">Jobs This Month</span>
-                <span className="text-xl font-bold text-white block">{jobsThisMonth}</span>
+                <span className="text-xl font-bold text-text-primary block">{jobsThisMonth}</span>
               </div>
               <div className="p-2.5 bg-surface-dark border border-border rounded-xl text-accent">
                 <TrendingUp className="w-4.5 h-4.5" />
@@ -197,7 +197,7 @@ const SuperDashboard = () => {
 
           {/* Pending Approvals Highlights Box */}
           <div className="bg-surface-ink border border-border rounded-3xl p-6 shadow-xl space-y-4 animate-fade-in stagger-1">
-            <h3 className="text-sm font-serif font-extrabold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+            <h3 className="text-sm font-serif font-extrabold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
               <ShieldAlert className="w-4.5 h-4.5 text-accent" />
               Shops Awaiting Approval ({pendingShopsCount})
             </h3>
@@ -217,12 +217,12 @@ const SuperDashboard = () => {
                         setDetailModalOpen(true);
                       }}
                     >
-                      <h4 className="text-xs font-serif font-bold text-white group-hover:text-accent transition-colors flex items-center gap-1.5">
+                      <h4 className="text-xs font-serif font-bold text-text-primary group-hover:text-accent transition-colors flex items-center gap-1.5">
                         {shop.name}
                         <Eye className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </h4>
                       <p className="text-[10px] text-muted">
-                        Owner: <span className="text-white font-medium">{shop.adminName}</span> ({shop.adminEmail}) • Slug: <span className="font-mono text-accent">/shops/{shop.slug}</span>
+                        Owner: <span className="text-text-primary font-medium">{shop.adminName}</span> ({shop.adminEmail}) • Slug: <span className="font-mono text-accent">/shops/{shop.slug}</span>
                       </p>
                       <span className="text-[9px] text-muted block">Applied: {new Date(shop.createdAt).toLocaleString()}</span>
                     </div>
@@ -252,7 +252,7 @@ const SuperDashboard = () => {
           {/* Platform recent jobs list
           <div className="bg-surface-ink border border-border rounded-3xl p-6 shadow-xl space-y-4 animate-fade-in stagger-2">
             <div className="flex justify-between items-center border-b border-border/40 pb-3">
-              <h3 className="text-sm font-serif font-extrabold text-white flex items-center gap-2">
+              <h3 className="text-sm font-serif font-extrabold text-text-primary flex items-center gap-2">
                 <FileText className="w-4.5 h-4.5 text-accent" />
                 Recent Platform Print Requests
               </h3>
@@ -282,13 +282,13 @@ const SuperDashboard = () => {
                   {recentPlatformJobs.map(job => (
                     <tr key={job.id} className="hover:bg-surface-dark/40 transition-colors">
                       <td className="py-3.5 px-3 font-mono font-bold text-accent">{job.accessToken}</td>
-                      <td className="py-3.5 px-3 text-white font-medium">{job.customerName}</td>
-                      <td className="py-3.5 px-3 text-white">{job.shopName}</td>
+                      <td className="py-3.5 px-3 text-text-primary font-medium">{job.customerName}</td>
+                      <td className="py-3.5 px-3 text-text-primary">{job.shopName}</td>
                       <td className="py-3.5 px-3">
                         <StatusBadge status={job.status} />
                       </td>
                       <td className="py-3.5 px-3 text-muted">{job.totalPages || '—'} pages</td>
-                      <td className="py-3.5 px-3 font-mono text-white font-semibold">
+                      <td className="py-3.5 px-3 font-mono text-text-primary font-semibold">
                         {job.estimatedCost !== null && job.estimatedCost !== undefined 
                           ? `₹${job.estimatedCost.toFixed(2)}` 
                           : 'Calculating...'}

@@ -166,7 +166,7 @@ const RegisterShopPage = () => {
                 /* Registration Multi-Step Form */
                 <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
                   <div className="space-y-2 border-b border-border/40 pb-4">
-                    <h1 className="text-2xl sm:text-3xl font-serif font-extrabold text-white">Register Your Print Shop</h1>
+                    <h1 className="text-2xl sm:text-3xl font-serif font-extrabold text-text-primary">Register Your Print Shop</h1>
                     <p className="text-xs text-muted">Join the PrintEase cloud. Grow local business and optimize document printing.</p>
                   </div>
 
@@ -187,7 +187,7 @@ const RegisterShopPage = () => {
                   {/* STEP 1: Shop information */}
                   {step === 1 && (
                     <div className="space-y-4 animate-scale-in">
-                      <h3 className="text-sm font-serif font-bold text-white flex items-center gap-2 border-b border-border/20 pb-2">
+                      <h3 className="text-sm font-serif font-bold text-text-primary flex items-center gap-2 border-b border-border/20 pb-2">
                         <Building2 className="w-4.5 h-4.5 text-accent" />
                         Step 1 — Shop Details
                       </h3>
@@ -269,7 +269,7 @@ const RegisterShopPage = () => {
                   {/* STEP 2: Account details */}
                   {step === 2 && (
                     <div className="space-y-4 animate-scale-in">
-                      <h3 className="text-sm font-serif font-bold text-white flex items-center gap-2 border-b border-border/20 pb-2">
+                      <h3 className="text-sm font-serif font-bold text-text-primary flex items-center gap-2 border-b border-border/20 pb-2">
                         <UserCheck className="w-4.5 h-4.5 text-accent" />
                         Step 2 — Admin Credentials
                       </h3>
@@ -335,7 +335,7 @@ const RegisterShopPage = () => {
                       <button
                         type="button"
                         onClick={prevStep}
-                        className="px-5 py-2.5 text-sm font-semibold rounded-xl bg-surface-dark border border-border text-white hover:bg-primary/20 transition-all flex items-center gap-1.5"
+                        className="px-5 py-2.5 text-sm font-semibold rounded-xl bg-surface-dark border border-border text-text-primary hover:bg-primary/20 transition-all flex items-center gap-1.5"
                       >
                         <ArrowLeft className="w-4 h-4" />
                         Previous Step
@@ -374,9 +374,9 @@ const RegisterShopPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <h1 className="text-3xl font-serif font-extrabold text-white">Registration Submitted!</h1>
+                    <h1 className="text-3xl font-serif font-extrabold text-text-primary">Registration Submitted!</h1>
                     <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
-                      Your shop configuration is under review. Our team will verify your details and notify you at <span className="text-white font-semibold">{registeredEmail}</span> within 24-48 hours.
+                      Your shop configuration is under review. Our team will verify your details and notify you at <span className="text-text-primary font-semibold">{registeredEmail}</span> within 24-48 hours.
                     </p>
                   </div>
 
@@ -396,7 +396,7 @@ const RegisterShopPage = () => {
                     </Link>
                     <Link
                       to="/login"
-                      className="flex-1 py-3 text-xs font-semibold bg-surface-dark border border-border text-white hover:bg-primary/20 rounded-xl text-center transition-colors"
+                      className="flex-1 py-3 text-xs font-semibold bg-surface-dark border border-border text-text-primary hover:bg-primary/20 rounded-xl text-center transition-colors"
                     >
                       Login Panel
                     </Link>
@@ -410,7 +410,7 @@ const RegisterShopPage = () => {
               
               {/* Benefits sidebar card */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 space-y-5 shadow-xl">
-                <h3 className="text-base font-serif font-extrabold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+                <h3 className="text-base font-serif font-extrabold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-accent" />
                   Why Join PrintEase?
                 </h3>
@@ -422,7 +422,7 @@ const RegisterShopPage = () => {
                       <ShieldCheck className="w-4 h-4" />
                     </div>
                     <div className="space-y-0.5">
-                      <h4 className="text-xs font-bold text-white">Instant QR Uploads</h4>
+                      <h4 className="text-xs font-bold text-text-primary">Instant QR Uploads</h4>
                       <p className="text-[10px] text-muted">A branded custom QR code placed at your counter handles document collection automatically.</p>
                     </div>
                   </div>
@@ -433,7 +433,7 @@ const RegisterShopPage = () => {
                       <Percent className="w-4 h-4" />
                     </div>
                     <div className="space-y-0.5">
-                      <h4 className="text-xs font-bold text-white">Full Pricing Autonomy</h4>
+                      <h4 className="text-xs font-bold text-text-primary">Full Pricing Autonomy</h4>
                       <p className="text-[10px] text-muted">Change page prices, formats, and file limitations in your admin settings panel instantly.</p>
                     </div>
                   </div>
@@ -444,7 +444,7 @@ const RegisterShopPage = () => {
                       <Smile className="w-4 h-4" />
                     </div>
                     <div className="space-y-0.5">
-                      <h4 className="text-xs font-bold text-white">Zero Account Setup Required</h4>
+                      <h4 className="text-xs font-bold text-text-primary">Zero Account Setup Required</h4>
                       <p className="text-[10px] text-muted">Customers upload files and pay counter-directly without logging into any system.</p>
                     </div>
                   </div>
@@ -458,7 +458,7 @@ const RegisterShopPage = () => {
                   PrintEase reduced our counter stapling errors by 80%. Students scan the QR, upload directly, and collect in 2 minutes. Outstanding!
                 </p>
                 <div className="space-y-0.5 text-left border-t border-border/40 pt-2.5">
-                  <span className="text-[10px] font-bold text-white block">Ashish Sharma</span>
+                  <span className="text-[10px] font-bold text-text-primary block">Ashish Sharma</span>
                   <span className="text-[9px] text-accent block">Manager, Campus Quick Print</span>
                 </div>
               </div>

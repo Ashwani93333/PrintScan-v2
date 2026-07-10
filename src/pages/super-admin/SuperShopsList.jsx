@@ -150,7 +150,7 @@ const SuperShopsList = () => {
 
         {/* Top Header */}
         <header className="px-6 h-16 border-b border-border flex items-center justify-between bg-surface-ink">
-          <h1 className="text-lg font-serif font-extrabold text-white">Registered Print Shops</h1>
+          <h1 className="text-lg font-serif font-extrabold text-text-primary">Registered Print Shops</h1>
           
           <Link
             to="/superadmin/shops/new"
@@ -209,7 +209,7 @@ const SuperShopsList = () => {
               <div className="p-4 bg-surface-dark border border-border rounded-full w-fit mx-auto text-muted">
                 <Inbox className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-serif font-bold text-white">No Shops Found</h3>
+              <h3 className="text-sm font-serif font-bold text-text-primary">No Shops Found</h3>
               <p className="text-xs text-muted">Refine your query parameters or register a new print shop partner.</p>
             </div>
           ) : (
@@ -229,8 +229,8 @@ const SuperShopsList = () => {
                   <tbody className="divide-y divide-border/40">
                     {paginatedShops.map(shop => (
                       <tr key={shop.id} className="hover:bg-surface-dark/30 transition-colors">
-                        <td className="py-3.5 px-4 font-serif font-bold text-white">{shop.name}</td>
-                        <td className="py-3.5 px-4 font-semibold text-white">{shop.adminName}</td>
+                        <td className="py-3.5 px-4 font-serif font-bold text-text-primary">{shop.name}</td>
+                        <td className="py-3.5 px-4 font-semibold text-text-primary">{shop.adminName}</td>
                         <td className="py-3.5 px-4 font-mono text-muted">{shop.adminEmail}</td>
                         <td className="py-3.5 px-4 font-mono text-accent">/shops/{shop.slug}</td>
                         <td className="py-3.5 px-4 text-center">
@@ -248,7 +248,7 @@ const SuperShopsList = () => {
                                 setDetailShopId(shop.id);
                                 setDetailModalOpen(true);
                               }}
-                              className="p-1.5 bg-surface-dark border border-border hover:border-accent/40 rounded-lg text-muted hover:text-white transition-all"
+                              className="p-1.5 bg-surface-dark border border-border hover:border-accent/40 rounded-lg text-muted hover:text-text-primary transition-all"
                               title="View Shop Details"
                             >
                               <Eye className="w-4 h-4" />
@@ -297,19 +297,19 @@ const SuperShopsList = () => {
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-white disabled:opacity-40 transition-colors"
+                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-text-primary disabled:opacity-40 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               
               <span className="text-xs text-muted font-medium">
-                Page <span className="text-white font-bold">{currentPage}</span> of <span className="text-white">{totalFilteredPages}</span>
+                Page <span className="text-text-primary font-bold">{currentPage}</span> of <span className="text-text-primary">{totalFilteredPages}</span>
               </span>
               
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalFilteredPages}
-                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-white disabled:opacity-40 transition-colors"
+                className="p-1.5 bg-surface-dark border border-border rounded-lg text-muted hover:text-text-primary disabled:opacity-40 transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

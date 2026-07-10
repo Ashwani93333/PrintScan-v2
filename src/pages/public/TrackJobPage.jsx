@@ -177,7 +177,7 @@ const TrackJobPage = () => {
               <div className="p-3 bg-surface-dark border border-border rounded-full w-fit mx-auto text-accent">
                 <Printer className="w-6 h-6" />
               </div>
-              <h2 className="text-xl font-serif font-bold text-white">Track Your Print Job</h2>
+              <h2 className="text-xl font-serif font-bold text-text-primary">Track Your Print Job</h2>
               <p className="text-xs text-muted max-w-xs mx-auto">
                 Enter the Shop-Handle & unique numeric token(e.g 23) printed on your success receipt to see live operational progress.
               </p>
@@ -188,13 +188,13 @@ const TrackJobPage = () => {
               <div className="p-3 bg-danger/10 border border-danger/20 rounded-full w-fit mx-auto text-danger">
                 <AlertCircle className="w-6 h-6" />
               </div>
-              <h2 className="text-xl font-serif font-bold text-white">Token Not Found</h2>
+              <h2 className="text-xl font-serif font-bold text-text-primary">Token Not Found</h2>
               <p className="text-xs text-muted max-w-xs mx-auto">
                 Token "{token}" was not found in our live database. Make sure there are no typos, or try registering a new print job.
               </p>
               <Link 
                 to="/"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-dark border border-border rounded-xl text-xs font-semibold text-white hover:bg-primary/20 transition-all mx-auto"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-dark border border-border rounded-xl text-xs font-semibold text-text-primary hover:bg-primary/20 transition-all mx-auto"
               >
                 Go Home
               </Link>
@@ -208,13 +208,13 @@ const TrackJobPage = () => {
                 <div className="flex items-center justify-between gap-3 border-b border-border/40 pb-4">
                   <div className="space-y-1">
                     <span className="text-[10px] text-muted font-bold tracking-wider uppercase">JOB TOKEN RECEIPT</span>
-                    <h1 className="font-mono text-3xl text-white font-extrabold text-glow-amber">
+                    <h1 className="font-mono text-3xl text-text-primary font-extrabold text-glow-amber">
                       #{job.accessToken}
                     </h1>
                   </div>
                   <button
                     onClick={triggerRefresh}
-                    className="p-2.5 bg-surface-dark hover:bg-surface-dark/75 border border-border rounded-xl text-muted hover:text-white transition-all flex items-center gap-1.5 text-xs font-semibold"
+                    className="p-2.5 bg-surface-dark hover:bg-surface-dark/75 border border-border rounded-xl text-muted hover:text-text-primary transition-all flex items-center gap-1.5 text-xs font-semibold"
                     disabled={isRefreshing}
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-accent' : ''}`} />
@@ -224,7 +224,7 @@ const TrackJobPage = () => {
 
                 {/* Shop specs details */}
                 <div className="space-y-2 text-xs text-muted">
-                  <h3 className="font-serif text-sm font-bold text-white">{shop?.name || job.shopName}</h3>
+                  <h3 className="font-serif text-sm font-bold text-text-primary">{shop?.name || job.shopName}</h3>
                   <div className="flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-accent" />
                     <span>{shop?.address || 'Partner Shop Location'}</span>
@@ -244,7 +244,7 @@ const TrackJobPage = () => {
 
               {/* Vertical Stepper Timeline */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 space-y-6">
-                <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-3">Operational Progress</h3>
+                <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-3">Operational Progress</h3>
                 
                 <div className="relative pl-6 border-l-2 border-border space-y-6">
                   {/* Step 1: Submitted */}
@@ -253,7 +253,7 @@ const TrackJobPage = () => {
                       <Check className="w-3 h-3" />
                     </span>
                     <div className="space-y-0.5">
-                      <h4 className="text-xs font-bold text-white">Job Submitted</h4>
+                      <h4 className="text-xs font-bold text-text-primary">Job Submitted</h4>
                       <p className="text-[10px] text-muted">Document transmitted successfully into print server.</p>
                     </div>
                   </div>
@@ -267,14 +267,14 @@ const TrackJobPage = () => {
                     ) : getStepStatus(job.status, 1) === 'active' ? (
                       <span className="absolute -left-[31px] top-0.5 w-5 h-5 rounded-full bg-amber-500 border-4 border-background animate-pulse-subtle"></span>
                     ) : getStepStatus(job.status, 1) === 'cancelled' ? (
-                      <span className="absolute -left-[31px] top-0.5 p-1 rounded-full bg-danger text-white border-2 border-background">
+                      <span className="absolute -left-[31px] top-0.5 p-1 rounded-full bg-danger text-text-primary border-2 border-background">
                         <AlertTriangle className="w-3 h-3" />
                       </span>
                     ) : (
                       <span className="absolute -left-[31px] top-0.5 w-5 h-5 rounded-full bg-border border-4 border-background"></span>
                     )}
                     <div className="space-y-0.5">
-                      <h4 className={`text-xs font-bold ${getStepStatus(job.status, 1) === 'active' ? 'text-amber-500' : 'text-white'}`}>
+                      <h4 className={`text-xs font-bold ${getStepStatus(job.status, 1) === 'active' ? 'text-amber-500' : 'text-text-primary'}`}>
                         Under Review
                       </h4>
                       <p className="text-[10px] text-muted">Shop staff verifying pages, duplex orientations, and layout bounds.</p>
@@ -290,14 +290,14 @@ const TrackJobPage = () => {
                     ) : getStepStatus(job.status, 2) === 'active' ? (
                       <span className="absolute -left-[31px] top-0.5 w-5 h-5 rounded-full bg-blue-500 border-4 border-background animate-spin border-t-transparent"></span>
                     ) : getStepStatus(job.status, 2) === 'cancelled' ? (
-                      <span className="absolute -left-[31px] top-0.5 p-1 rounded-full bg-danger text-white border-2 border-background">
+                      <span className="absolute -left-[31px] top-0.5 p-1 rounded-full bg-danger text-text-primary border-2 border-background">
                         <AlertTriangle className="w-3 h-3" />
                       </span>
                     ) : (
                       <span className="absolute -left-[31px] top-0.5 w-5 h-5 rounded-full bg-border border-4 border-background"></span>
                     )}
                     <div className="space-y-0.5">
-                      <h4 className={`text-xs font-bold ${getStepStatus(job.status, 2) === 'active' ? 'text-blue-400' : 'text-white'}`}>
+                      <h4 className={`text-xs font-bold ${getStepStatus(job.status, 2) === 'active' ? 'text-blue-400' : 'text-text-primary'}`}>
                         Printing
                       </h4>
                       <p className="text-[10px] text-muted">Ink deposition and paper feed processes actively printing pages.</p>
@@ -311,14 +311,14 @@ const TrackJobPage = () => {
                         <Check className="w-3 h-3" />
                       </span>
                     ) : getStepStatus(job.status, 3) === 'cancelled' ? (
-                      <span className="absolute -left-[31px] top-0.5 p-1 rounded-full bg-danger text-white border-2 border-background">
+                      <span className="absolute -left-[31px] top-0.5 p-1 rounded-full bg-danger text-text-primary border-2 border-background">
                         <AlertTriangle className="w-3 h-3" />
                       </span>
                     ) : (
                       <span className="absolute -left-[31px] top-0.5 w-5 h-5 rounded-full bg-border border-4 border-background"></span>
                     )}
                     <div className="space-y-0.5">
-                      <h4 className={`text-xs font-bold ${job.status === 'COMPLETED' ? 'text-success' : 'text-white'}`}>
+                      <h4 className={`text-xs font-bold ${job.status === 'COMPLETED' ? 'text-success' : 'text-text-primary'}`}>
                         Ready to Collect
                       </h4>
                       <p className="text-[10px] text-muted">Prints are complete and organized at counter. Awaiting collection.</p>
@@ -329,7 +329,7 @@ const TrackJobPage = () => {
 
               {/* Job configuration details */}
               <div className="bg-surface-ink border border-border rounded-3xl p-6 space-y-4">
-                <h3 className="text-sm font-serif font-bold text-white border-b border-border/40 pb-3 flex items-center gap-2">
+                <h3 className="text-sm font-serif font-bold text-text-primary border-b border-border/40 pb-3 flex items-center gap-2">
                   <FileCheck className="w-4 h-4 text-accent" />
                   Print Details
                 </h3>
@@ -338,13 +338,13 @@ const TrackJobPage = () => {
                   {/* Total files */}
                   <div className="flex justify-between py-1.5 border-b border-border/20">
                     <span className="text-muted">Files Transmitted:</span>
-                    <span className="text-white font-bold">{job.files?.length} Files</span>
+                    <span className="text-text-primary font-bold">{job.files?.length} Files</span>
                   </div>
 
                   {/* Total Pages */}
                   <div className="flex justify-between py-1.5 border-b border-border/20">
                     <span className="text-muted">Total Pages:</span>
-                    <span className="text-white font-bold">{job.totalPages !== null && job.totalPages !== undefined ? `${job.totalPages} Pages` : '—'}</span>
+                    <span className="text-text-primary font-bold">{job.totalPages !== null && job.totalPages !== undefined ? `${job.totalPages} Pages` : '—'}</span>
                   </div>
                   
                   {/* File Names listing */}
@@ -352,7 +352,7 @@ const TrackJobPage = () => {
                     <span className="text-[10px] text-muted font-bold uppercase block mb-1">Filenames:</span>
                     <div className="space-y-1">
                       {job.files?.map(f => (
-                        <div key={f.id} className="flex items-center gap-1.5 text-[10px] text-white bg-surface-dark px-2 py-1 rounded border border-border/60">
+                        <div key={f.id} className="flex items-center gap-1.5 text-[10px] text-text-primary bg-surface-dark px-2 py-1 rounded border border-border/60">
                           <FileText className="w-3 h-3 text-blue-400 flex-shrink-0" />
                           <span className="truncate">{f.originalName}</span>
                         </div>
@@ -363,17 +363,17 @@ const TrackJobPage = () => {
                   {/* Print settings summary */}
                   <div className="flex justify-between py-1.5 border-b border-border/20">
                     <span className="text-muted">Color Print:</span>
-                    <span className="text-white font-semibold">{job.colorPrint ? 'Full Color' : 'Grayscale (B&W)'}</span>
+                    <span className="text-text-primary font-semibold">{job.colorPrint ? 'Full Color' : 'Grayscale (B&W)'}</span>
                   </div>
 
                   <div className="flex justify-between py-1.5 border-b border-border/20">
                     <span className="text-muted">Orientation & Duplex:</span>
-                    <span className="text-white font-semibold">{job.doubleSided ? 'Double-Sided (Duplex)' : 'Single-Sided'}</span>
+                    <span className="text-text-primary font-semibold">{job.doubleSided ? 'Double-Sided (Duplex)' : 'Single-Sided'}</span>
                   </div>
 
                   <div className="flex justify-between py-1.5 border-b border-border/20">
                     <span className="text-muted">Paper Size & Copies:</span>
-                    <span className="text-white font-semibold">{job.printOptions?.paperSize || 'A4'} • {job.copies} Copies</span>
+                    <span className="text-text-primary font-semibold">{job.printOptions?.paperSize || 'A4'} • {job.copies} Copies</span>
                   </div>
 
                   {/* Estimated Cost */}
