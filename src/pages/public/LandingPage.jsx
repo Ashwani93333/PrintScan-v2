@@ -151,7 +151,7 @@ const LandingPage = () => {
                     <div>
                       <div className="flex items-center gap-2 mb-1.5">
                         <FileText className="w-4 h-4 text-red-500" />
-                        <span className="text-slate-700 font-bold text-sm">DBMS notes.pdf</span>
+                        <span className="text-slate-700 font-bold text-sm">AI/Ml notes.pdf</span>
                       </div>
                       <div className="flex gap-2 text-[10px] font-bold">
                         <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md">24pgs</span>
@@ -174,7 +174,7 @@ const LandingPage = () => {
                     <div>
                       <div className="flex items-center gap-2 mb-1.5">
                         <Image className="w-4 h-4 text-blue-500" />
-                        <span className="text-slate-700 font-bold text-sm">Admit Card.jpg</span>
+                        <span className="text-slate-700 font-bold text-sm">2nd Sem-Result.pdf</span>
                       </div>
                       <div className="flex gap-2 text-[10px] font-bold">
                         <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md">1pg</span>

@@ -90,7 +90,7 @@ const Navbar = () => {
                 {/* Dynamic Role Badge */}
                 <Link
                   to={user.role === 'SUPER_ADMIN' ? '/superadmin/dashboard' : '/admin/dashboard'}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary border border-border hover:border-accent/40 text-xs font-semibold text-text-primary transition-all duration-200"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary border border-border hover:border-accent/40 text-xs font-semibold text-white transition-all duration-200"
                 >
                   {user.role === 'SUPER_ADMIN' ? (
                     <ShieldAlert className="w-4 h-4 text-accent" />
@@ -190,7 +190,7 @@ const Navbar = () => {
               <Link
                 to={user.role === 'SUPER_ADMIN' ? '/superadmin/dashboard' : '/admin/dashboard'}
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-primary border border-border font-semibold text-sm text-text-primary"
+                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-primary border border-border font-semibold text-sm text-white"
               >
                 Dashboard Panel
               </Link>

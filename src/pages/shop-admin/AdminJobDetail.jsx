@@ -163,7 +163,7 @@ const AdminJobDetail = () => {
       setToastMessage(`Preparing "${fileName}" for printing...`);
       
       const res = await fetch(fileUrl);
-      if (!res.ok) throw new Error("Failed to fetch file from CDN");
+      if (!res.ok) throw new Error("File is Deleted or Unavailable for Printing Due to Privacy Policy");
       const blob = await res.blob();
       
       const fileType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : blob.type;
