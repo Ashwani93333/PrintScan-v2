@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { Analytics } from '@vercel/analytics/react';
 
 // Import Pages
 import LandingPage from './pages/public/LandingPage';
@@ -152,6 +153,7 @@ function App() {
         {/* Fallback 404 Route */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Analytics />
     </BrowserRouter>
   );
 }
