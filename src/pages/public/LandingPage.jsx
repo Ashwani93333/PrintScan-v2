@@ -84,7 +84,7 @@ const LandingPage = () => {
           <div className="lg:col-span-7 space-y-6 text-left animate-fade-up">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accent/10 border border-accent/25 text-accent text-xs font-semibold">
               <TrendingUp className="w-3.5 h-3.5" />
-              <span>20+ shops | 1000+ prints daily | Shop revenue</span>
+              <span>10+ shops | 455+ prints daily | Shop revenue</span>
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-extrabold text-text-primary leading-[1.1] tracking-tight">
@@ -222,7 +222,7 @@ const LandingPage = () => {
                 <div className="p-3 w-fit bg-background rounded-xl border border-border text-accent">
                   <Compass className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-serif font-bold text-text-primary">Enter Shop Handle</h3>3
+                <h3 className="text-lg font-serif font-bold text-text-primary">Enter Shop Handle</h3>
                 <p className="text-sm text-muted">
                   Know your print shop's unique handle? Enter it directly to jump straight into their upload portal.
                 </p>

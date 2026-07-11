@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { 
   Search, 
-  Eye, 
   Trash2, 
   SlidersHorizontal, 
   ChevronLeft, 
@@ -233,7 +232,11 @@ const AdminJobsList = () => {
                   </thead>
                   <tbody className="divide-y divide-border/40">
                     {shopJobs.map(job => (
-                      <tr key={job.id} className="hover:bg-surface-dark/30 transition-colors">
+                      <tr 
+                        key={job.id} 
+                        className="hover:bg-surface-dark/30 transition-colors cursor-pointer"
+                        onClick={() => navigate(`/admin/jobs/${job.id}`)}
+                      >
                         <td className="py-3.5 px-4 font-mono font-bold text-accent">{job.accessToken}</td>
                         <td className="py-3.5 px-4 font-semibold text-text-primary">{job.customerName}</td>
                         <td className="py-3.5 px-4 font-mono text-muted">{job.customerPhone}</td>
@@ -253,16 +256,12 @@ const AdminJobsList = () => {
                         </td>
                         <td className="py-3.5 px-4 text-right">
                           <div className="flex gap-1.5 justify-end">
-                            <button
-                              onClick={() => navigate(`/admin/jobs/${job.id}`)}
-                              className="p-1.5 bg-surface-dark border border-border hover:border-accent/40 rounded-lg text-muted hover:text-text-primary transition-all"
-                              title="View/Update Details"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
                             {(job.status === 'PENDING' || job.status === 'PROCESSING') && (
                               <button
-                                onClick={() => handleCancelClick(job.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCancelClick(job.id);
+                                }}
                                 className="p-1.5 bg-danger/10 border border-transparent hover:border-danger/20 rounded-lg text-danger hover:bg-danger/15 transition-all"
                                 title="Cancel Print Job"
                               >
