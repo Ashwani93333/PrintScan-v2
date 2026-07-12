@@ -23,35 +23,21 @@ import {
   Info
 } from 'lucide-react';
 import Navbar from '../../components/Navbar';
+import { PDFDocument } from 'pdf-lib';
 
 // Client-side PDF page counter helper + format converter
 const getFilePageCount = async (file) => {
-  if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = function() {
-        try {
-          const text = reader.result;
-          // Look for /Count followed by whitespace and numbers
-          const regex = /\/Count\s+(\d+)/g;
-          let matches;
-          let maxPages = 0;
-          while ((matches = regex.exec(text)) !== null) {
-            const p = parseInt(matches[1], 10);
-            if (p > maxPages) maxPages = p;
-          }
-          if (maxPages > 0) {
-            resolve(maxPages);
-            return;
-          }
-        } catch (e) {
-          console.error("Error parsing PDF pages", e);
-        }
-        resolve(2); // default fallback
-      };
-      reader.onerror = () => resolve(2);
-      reader.readAsText(file.slice(0, 1024 * 200)); // Read first 200KB only
-    });
+  if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+      const pageCount = pdfDoc.getPageCount();
+      return pageCount > 0 ? pageCount : 1;
+    } catch (e) {
+      console.error("Error parsing PDF pages with pdf-lib", e);
+      // Fallback: guess based on file size (approx 100KB per page) if parsing fails
+      return Math.max(1, Math.ceil(file.size / 102400));
+    }
   } else if (file.type.startsWith('image/')) {
     return 1;
   } else {
