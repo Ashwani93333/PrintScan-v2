@@ -56,6 +56,13 @@ const SuperCreateShop = () => {
       setToastMessage('Please fill in all required fields.');
       return;
     }
+
+    if (!/^\d{10}$/.test(phone.trim())) {
+      setToastType('error');
+      setToastMessage('Phone number must be exactly 10 digits and only numeric.');
+      return;
+    }
+
     if (!adminName.trim() || !adminEmail.trim()) {
       setToastType('error');
       setToastMessage('Please provide admin name and email.');

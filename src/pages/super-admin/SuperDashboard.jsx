@@ -59,7 +59,7 @@ const SuperDashboard = () => {
   const pendingShopsCount = pendingApprovals.length;
   
   const totalJobs = analytics?.totalJobs || 0;
-  const jobsThisMonth = analytics?.jobsThisMonth || 0;
+  // const jobsThisMonth = analytics?.jobsThisMonth || 0;
 
   // Filter pending approvals list
   const pendingList = pendingApprovals
@@ -183,7 +183,7 @@ const SuperDashboard = () => {
             </div>
 
             {/* Jobs This Month */}
-            <div className="bg-surface-ink border border-border p-4.5 rounded-2xl flex items-center justify-between shadow-md">
+            {/* <div className="bg-surface-ink border border-border p-4.5 rounded-2xl flex items-center justify-between shadow-md">
               <div className="space-y-1">
                 <span className="text-[10px] text-muted font-bold uppercase block">Jobs This Month</span>
                 <span className="text-xl font-bold text-text-primary block">{jobsThisMonth}</span>
@@ -191,7 +191,7 @@ const SuperDashboard = () => {
               <div className="p-2.5 bg-surface-dark border border-border rounded-xl text-accent">
                 <TrendingUp className="w-4.5 h-4.5" />
               </div>
-            </div>
+            </div> */}
 
           </div>
 

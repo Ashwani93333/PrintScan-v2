@@ -205,6 +205,12 @@ const AdminProfile = () => {
       return;
     }
 
+    if (!/^\d{10}$/.test(phone.trim())) {
+      setToastType('error');
+      setToastMessage('Phone number must be exactly 10 digits and only numeric.');
+      return;
+    }
+
     try {
       await api.updateShopProfile(shopId, {
         name,

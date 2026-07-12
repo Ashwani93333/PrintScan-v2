@@ -228,7 +228,14 @@ const SuperShopsList = () => {
                   </thead>
                   <tbody className="divide-y divide-border/40">
                     {paginatedShops.map(shop => (
-                      <tr key={shop.id} className="hover:bg-surface-dark/30 transition-colors">
+                      <tr 
+                        key={shop.id} 
+                        className="hover:bg-surface-dark/30 transition-colors cursor-pointer"
+                        onClick={() => {
+                          setDetailShopId(shop.id);
+                          setDetailModalOpen(true);
+                        }}
+                      >
                         <td className="py-3.5 px-4 font-serif font-bold text-text-primary">{shop.name}</td>
                         <td className="py-3.5 px-4 font-semibold text-text-primary">{shop.adminName}</td>
                         <td className="py-3.5 px-4 font-mono text-muted">{shop.adminEmail}</td>
@@ -242,22 +249,10 @@ const SuperShopsList = () => {
                         </td>
                         <td className="py-3.5 px-4 text-right">
                           <div className="flex gap-2 justify-end items-center">
-                            {/* View Shop Details */}
-                            <button
-                              onClick={() => {
-                                setDetailShopId(shop.id);
-                                setDetailModalOpen(true);
-                              }}
-                              className="p-1.5 bg-surface-dark border border-border hover:border-accent/40 rounded-lg text-muted hover:text-text-primary transition-all"
-                              title="View Shop Details"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-
                             {/* Approve/Disapprove Actions */}
                             {!shop.isApproved ? (
                               <button
-                                onClick={() => handleApproveAction(shop.id, shop.name)}
+                                onClick={(e) => { e.stopPropagation(); handleApproveAction(shop.id, shop.name); }}
                                 className="p-1.5 bg-success/10 border border-transparent hover:border-success/20 rounded-lg text-success hover:bg-success/20 transition-all"
                                 title="Approve Shop"
                               >
@@ -265,7 +260,7 @@ const SuperShopsList = () => {
                               </button>
                             ) : (
                               <button
-                                onClick={() => handleDisapproveAction(shop.id, shop.name)}
+                                onClick={(e) => { e.stopPropagation(); handleDisapproveAction(shop.id, shop.name); }}
                                 className="p-1.5 bg-warning/10 border border-transparent hover:border-warning/20 rounded-lg text-amber-500 hover:bg-amber-500/20 transition-all"
                                 title="Revoke Approval"
                               >
@@ -275,7 +270,7 @@ const SuperShopsList = () => {
 
                             {/* Delete Shop button */}
                             <button
-                              onClick={() => handleDeleteClick(shop.id, shop.name)}
+                              onClick={(e) => { e.stopPropagation(); handleDeleteClick(shop.id, shop.name); }}
                               className="p-1.5 bg-danger/10 border border-transparent hover:border-danger/25 rounded-lg text-danger hover:bg-danger/20 transition-all"
                               title="Delete Shop Partner"
                             >

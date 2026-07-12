@@ -76,11 +76,15 @@ const AdminJobDetail = () => {
     const pagesVal = parseInt(e.target.value) || 0;
     setTotalPages(pagesVal);
 
-    if (pagesVal > 0 && shop && job?.printOptions) {
-      const price = job.printOptions.colorPrint 
+    if (pagesVal > 0 && shop && job) {
+      const isColor = job.colorPrint !== undefined ? job.colorPrint : job.printOptions?.colorPrint;
+      const copies = job.copies !== undefined ? job.copies : (job.printOptions?.copies || 1);
+      
+      const price = isColor 
         ? shop.requirements?.pricePerPageColor || 10
-        : shop.requirements?.pricePerPageBW || 2;
-      const calculated = pagesVal * price * (job.printOptions.copies || 1);
+        : shop.requirements?.pricePerPageBW || 5;
+        
+      const calculated = pagesVal * price * copies;
       setEstimatedCost(calculated.toFixed(2));
     } else {
       setEstimatedCost('');
@@ -369,9 +373,20 @@ const AdminJobDetail = () => {
                             <span className="text-[10px] text-muted block mt-0.5">
                               Size: {(file.sizeBytes / (1024 * 1024)).toFixed(2)} MB • {filePageCount} {filePageCount === 1 ? 'page' : 'pages'}
                             </span>
-                            <span className="inline-block mt-1 text-[9px] font-semibold bg-[#E6F4EA] text-[#137333] px-2 py-0.5 rounded">
-                              {file.colorPrint ? 'Color' : 'B&W'} • {fileCopies} {fileCopies === 1 ? 'copy' : 'copies'} • {file.doubleSided ? 'Double-Sided' : 'Single-Sided'} • ₹{fileCost.toFixed(2)}
-                            </span>
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${file.colorPrint ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-gray-500/10 text-gray-400 border border-gray-500/20'}`}>
+                                {file.colorPrint ? 'Color' : 'B&W'}
+                              </span>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                {fileCopies} {fileCopies === 1 ? 'Copy' : 'Copies'}
+                              </span>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                                {file.doubleSided ? 'Double-Sided' : 'Single-Sided'}
+                              </span>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                ₹{fileCost.toFixed(2)}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
@@ -469,7 +484,7 @@ const AdminJobDetail = () => {
                     </div>
                     {totalPages > 0 && shop && (
                       <span className="text-[9px] text-accent block mt-0.5 font-semibold">
-                        Multiplier: {totalPages} pages x ₹{job.printOptions.colorPrint ? shop.requirements.pricePerPageColor : shop.requirements.pricePerPageBW} rate x {job.printOptions.copies} copies.
+                        Multiplier: {totalPages} pages x ₹{(job.colorPrint !== undefined ? job.colorPrint : job.printOptions?.colorPrint) ? shop.requirements.pricePerPageColor : shop.requirements.pricePerPageBW} rate x {job.copies !== undefined ? job.copies : (job.printOptions?.copies || 1)} copies.
                       </span>
                     )}
                   </div>

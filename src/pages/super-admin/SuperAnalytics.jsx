@@ -137,10 +137,10 @@ const SuperAnalytics = () => {
               <span className="text-[8px] text-muted flex items-center gap-0.5"><Store className="w-2.5 h-2.5" /> platform vendors</span>
             </div>
 
-            {/* Active Shops */}
+            {/* Approved Shops */}
             <div className="bg-surface-ink border border-border p-4 rounded-xl space-y-1">
-              <span className="text-[9px] text-muted font-bold uppercase tracking-wider block">Active Shops</span>
-              <span className="text-xl font-bold text-success block">{stats.activeShops}</span>
+              <span className="text-[9px] text-muted font-bold uppercase tracking-wider block">Approved Shops</span>
+              <span className="text-xl font-bold text-success block">{stats.approvedShops}</span>
               <span className="text-[8px] text-muted flex items-center gap-0.5"><Layers className="w-2.5 h-2.5 text-success" /> currently open</span>
             </div>
 

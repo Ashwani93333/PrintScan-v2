@@ -185,14 +185,14 @@ const AdminDashboard = () => {
                     <span className="text-xs text-muted">Total Earned</span>
                     <span className="font-mono text-base text-success font-black">₹{totalRevenue.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
+                  {/* <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
                     <span className="text-xs text-muted">Pending Estimates</span>
                     <span className="font-mono text-sm text-text-primary font-extrabold">—</span>
                   </div>
                   <div className="flex justify-between items-end border-b border-border/20 pb-1.5">
                     <span className="text-xs text-muted">Awaiting Collection</span>
                     <span className="font-mono text-sm text-accent font-extrabold">—</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -291,12 +291,15 @@ const AdminDashboard = () => {
                         <th className="py-3 px-3">Pages</th>
                         <th className="py-3 px-3">Price</th>
                         <th className="py-3 px-3">Submitted At</th>
-                        <th className="py-3 px-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/40">
                       {recentJobs.map((job) => (
-                        <tr key={job.id} className="hover:bg-surface-dark/40 transition-colors">
+                        <tr 
+                          key={job.id} 
+                          className="hover:bg-surface-dark/40 transition-colors cursor-pointer"
+                          onClick={() => navigate(`/admin/jobs/${job.id}`)}
+                        >
                           <td className="py-3 px-3 font-mono font-bold text-accent">{job.accessToken}</td>
                           <td className="py-3 px-3 text-text-primary font-medium">{job.customerName}</td>
                           <td className="py-3 px-3">
@@ -311,15 +314,6 @@ const AdminDashboard = () => {
                               : '—'}
                           </td>
                           <td className="py-3 px-3 text-muted">{new Date(job.createdAt).toLocaleTimeString()}</td>
-                          <td className="py-3 px-3 text-right">
-                            <button
-                              onClick={() => navigate(`/admin/jobs/${job.id}`)}
-                              className="p-1.5 bg-surface-dark hover:bg-surface-dark/70 border border-border hover:border-accent/40 text-muted hover:text-text-primary rounded-lg transition-all"
-                              title="View Details"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                          </td>
                         </tr>
                       ))}
                     </tbody>
